@@ -73,6 +73,7 @@
   background-color: #262626;
   margin: 12px;
   border-radius: 6px;
+  padding: 0; /* overrides .panel-body's 16px so the map fills this box flush */
 }
 
 .panel-empty-text {

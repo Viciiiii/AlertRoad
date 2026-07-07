@@ -1,15 +1,17 @@
+import { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import RiskMapModal from "./RiskMapModal";
 import "./RiskMap.css";
 
-const RISK_COLORS = {
+export const RISK_COLORS = {
   High: "#e02424",
   Medium: "#f5a623",
   Low: "#22c55e",
 };
 
-function createTriangleIcon(color) {
+export function createTriangleIcon(color) {
   const svg = `
     <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
       <polygon points="14,3 25,24 3,24" fill="${color}" stroke="#1a1a1a" stroke-width="1.5" />
@@ -26,10 +28,12 @@ function createTriangleIcon(color) {
   });
 }
 
-const DEFAULT_CENTER = [14.631, 121.079]; // Quezon City fallback
-const DEFAULT_ZOOM = 13;
+export const DEFAULT_CENTER = [14.631, 121.079]; // Quezon City fallback
+export const DEFAULT_ZOOM = 13;
 
 function RiskMap({ scans }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const scansWithCoords = scans.filter(
     (scan) => typeof scan.lat === "number" && typeof scan.lng === "number"
   );
@@ -47,6 +51,16 @@ function RiskMap({ scans }) {
 
   return (
     <div className="risk-map-wrapper">
+      <button
+        type="button"
+        className="risk-map-expand-button"
+        onClick={() => setIsExpanded(true)}
+        aria-label="Expand map"
+        title="Expand map"
+      >
+        ⛶
+      </button>
+
       <MapContainer
         center={center}
         zoom={DEFAULT_ZOOM}
@@ -72,6 +86,14 @@ function RiskMap({ scans }) {
           </Marker>
         ))}
       </MapContainer>
+
+      {isExpanded && (
+        <RiskMapModal
+          scans={scansWithCoords}
+          center={center}
+          onClose={() => setIsExpanded(false)}
+        />
+      )}
     </div>
   );
 }

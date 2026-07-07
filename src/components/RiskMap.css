@@ -15,6 +15,7 @@
   min-height: 260px;
   border-radius: 6px;
   overflow: hidden;
+  position: relative; /* anchors the absolutely-positioned expand button */
 }
 
 /* --- className passed directly to <MapContainer> ---
@@ -69,6 +70,38 @@
 }
 
 /* ==========================================================================
+   Expand button (opens RiskMapModal for a larger view)
+   Sits inside .risk-map-wrapper, absolutely positioned over the map's
+   top-right corner. z-index must clear Leaflet's own controls, which use
+   up to z-index: 1000 — same reasoning as CameraSelect's dropdown fix.
+   ========================================================================== */
+
+.risk-map-expand-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1100;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: rgba(32, 38, 47, 0.9);
+  color: #e6e6e6;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.risk-map-expand-button:hover {
+  background-color: #2a323d;
+  color: #ffffff;
+}
+
+/* ==========================================================================
    Popup styling (shown when a marker is clicked)
    Targets Leaflet's own popup classes — the Popup content itself in
    RiskMap.jsx is plain <strong>/<br> markup, so no custom content classes
@@ -104,5 +137,13 @@
   .risk-map-wrapper,
   .risk-map-container {
     min-height: 200px;
+  }
+
+  .risk-map-expand-button {
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
   }
 }
