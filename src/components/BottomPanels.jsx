@@ -32,8 +32,6 @@ function BottomPanels({ recentScans, onSelectScan }) {
           <span className="recent-scans-title">Recent Scans</span>
         </div>
 
-        <div className="recent-scans-divider" />
-
         <div className="recent-scans-body">
           {recentScans.length === 0 ? (
             <p className="panel-empty-text">
