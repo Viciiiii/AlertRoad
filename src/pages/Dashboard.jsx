@@ -99,38 +99,40 @@ function Dashboard() {
     <div className="dashboard-page">
       <NavBar />
 
-      <div className="dashboard-hero">
-        <h1 className="dashboard-title">
-          See road risk before it becomes an accident
-        </h1>
-        <p className="dashboard-subtitle">
-          AlertRoad reads road images and recorded CCTV footage, detects
-          damage and traffic, and scores accident risk automatically — so LGU
-          teams know exactly where to act first.
-        </p>
-      </div>
+      <div className="dashboard-fold">
+        <div className="dashboard-hero">
+          <h1 className="dashboard-title">
+            See road risk before it becomes an accident
+          </h1>
+          <p className="dashboard-subtitle">
+            AlertRoad reads road images and recorded CCTV footage, detects
+            damage and traffic, and scores accident risk automatically — so LGU
+            teams know exactly where to act first.
+          </p>
+        </div>
 
-      <div className="dashboard-content">
-        {scanState === "success" && currentScan ? (
-          <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />
-        ) : (
-          <UploadSection
-            scanState={scanState}
-            onFileSelect={handleFileSelect}
-            onClassify={handleClassify}
-            onRetry={handleRetry}
-            cameras={cameras}
-            selectedCameraId={selectedCameraId}
-            onSelectCamera={setSelectedCameraId}
-            onAddCamera={() => setShowAddCameraModal(true)}
-            onDeleteCamera={handleDeleteCamera}
+        <div className="dashboard-content">
+          {scanState === "success" && currentScan ? (
+            <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />
+          ) : (
+            <UploadSection
+              scanState={scanState}
+              onFileSelect={handleFileSelect}
+              onClassify={handleClassify}
+              onRetry={handleRetry}
+              cameras={cameras}
+              selectedCameraId={selectedCameraId}
+              onSelectCamera={setSelectedCameraId}
+              onAddCamera={() => setShowAddCameraModal(true)}
+              onDeleteCamera={handleDeleteCamera}
+            />
+          )}
+
+          <BottomPanels
+            recentScans={recentScans}
+            onSelectScan={handleOpenModal}
           />
-        )}
-
-        <BottomPanels
-          recentScans={recentScans}
-          onSelectScan={handleOpenModal}
-        />
+        </div>
       </div>
 
       <InfoSections />

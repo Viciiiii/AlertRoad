@@ -7,6 +7,17 @@
   text-align: center;
 }
 
+/* The three sections combined can be shorter than the viewport, especially
+   on tall screens. When that happens, clicking a NavBar link tries to
+   scroll a section flush to the top, but the browser can't scroll past
+   the bottom of the page — so it stops short and leaves a gap above the
+   section instead. Extra bottom padding on the last section (in its own
+   background color, not the page's white) gives enough scroll room for
+   any of the three anchors to land flush at the top on any screen size. */
+.info-section:last-of-type {
+  padding-bottom: 220px;
+}
+
 .info-section-light {
   background-color: #f2efe9;
 }
