@@ -27,38 +27,54 @@ function BottomPanels({ recentScans, onSelectScan }) {
       </div>
 
       <div className="panel recent-scans-panel">
-        <div className="panel-header">
-          <span className="panel-icon">⟳</span>
-          <span className="panel-title">Recent Scans</span>
+        <div className="recent-scans-header">
+          <span className="recent-scans-icon">⟳</span>
+          <span className="recent-scans-title">Recent Scans</span>
         </div>
-        <div className="panel-body">
+
+        <div className="recent-scans-divider" />
+
+        <div className="recent-scans-body">
           {recentScans.length === 0 ? (
             <p className="panel-empty-text">
               Nothing scanned yet. Your first result will show up here.
             </p>
           ) : (
-            <table className="recent-scans-table">
-              <thead>
-                <tr>
-                  <th>Location</th>
-                  <th>Type</th>
-                  <th>Risk</th>
-                </tr>
-              </thead>
-              <tbody>
+            <div className="recent-scans-table">
+              <div className="recent-scans-columns">
+                <span className="recent-scans-cell recent-scans-cell-location">
+                  Location
+                </span>
+                <span className="recent-scans-cell recent-scans-cell-type">
+                  Type
+                </span>
+                <span className="recent-scans-cell recent-scans-cell-risk">
+                  Risk
+                </span>
+              </div>
+
+              <div className="recent-scans-columns-divider" />
+
+              <div className="recent-scans-rows">
                 {recentScans.map((scan, index) => (
-                  <tr
+                  <div
                     key={index}
                     className="recent-scans-row"
                     onClick={() => onSelectScan(scan)}
                   >
-                    <td>{scan.location}</td>
-                    <td>{scan.fileType}</td>
-                    <td className="recent-scans-risk">{scan.riskLevel} Risk</td>
-                  </tr>
+                    <span className="recent-scans-cell recent-scans-cell-location">
+                      {scan.location}
+                    </span>
+                    <span className="recent-scans-cell recent-scans-cell-type">
+                      {scan.fileType}
+                    </span>
+                    <span className="recent-scans-cell recent-scans-cell-risk">
+                      {scan.riskLevel} Risk
+                    </span>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           )}
         </div>
       </div>

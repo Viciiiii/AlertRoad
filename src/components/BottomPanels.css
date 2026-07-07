@@ -5,13 +5,15 @@
 }
 
 .panel {
-  background-color: #1a1a1a;
+  background-color: #1e1e1e;
   border-radius: 8px;
   overflow: hidden;
   min-height: 220px;
   display: flex;
   flex-direction: column;
 }
+
+/* --- Road Risk Map (unchanged) --- */
 
 .panel-header {
   display: flex;
@@ -27,11 +29,6 @@
   color: #ffffff;
   font-size: 14px;
   font-weight: 600;
-}
-
-.panel-icon {
-  color: #a0a0a0;
-  margin-right: 8px;
 }
 
 .panel-legend {
@@ -85,38 +82,126 @@
   max-width: 260px;
 }
 
-.recent-scans-table {
-  width: 100%;
-  border-collapse: collapse;
+/* --- Recent Scans --- */
+
+.recent-scans-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px;
 }
 
-.recent-scans-table th {
-  text-align: left;
-  color: #a0a0a0;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 8px 12px;
+.recent-scans-icon {
+  color: #9ca3af;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.recent-scans-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recent-scans-divider {
+  height: 1px;
+  background-color: #333333;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.recent-scans-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px 20px 24px;
+  min-height: 0;
+}
+
+.recent-scans-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.recent-scans-columns {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.recent-scans-columns-divider {
+  height: 1px;
+  background-color: #2a2a2a;
+  width: 100%;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.recent-scans-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .recent-scans-row {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
   cursor: pointer;
   transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.recent-scans-row:not(:first-child) {
+  border-top: 1px solid #2a2a2a;
 }
 
 .recent-scans-row:hover {
   background-color: #262626;
 }
 
-.recent-scans-row td {
-  color: #ffffff;
+.recent-scans-cell {
   font-size: 13px;
-  padding: 10px 12px;
-  border-top: 1px solid #333333;
+  color: #ffffff;
 }
 
-.recent-scans-risk {
+.recent-scans-columns .recent-scans-cell {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.recent-scans-cell-location {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12px;
+}
+
+.recent-scans-cell-type {
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.recent-scans-cell-risk {
+  width: 90px;
+  flex-shrink: 0;
+  text-align: right;
   color: #e02424;
   font-weight: 600;
+}
+
+.recent-scans-columns .recent-scans-cell-risk {
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 /* Responsive */
@@ -131,8 +216,17 @@
     min-height: 180px;
   }
 
-  .recent-scans-panel .panel-body {
-    overflow-x: auto;
-    display: block;
+  .recent-scans-header,
+  .recent-scans-body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .recent-scans-cell-type {
+    width: 50px;
+  }
+
+  .recent-scans-cell-risk {
+    width: 70px;
   }
 }
