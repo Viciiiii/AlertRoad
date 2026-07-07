@@ -1,7 +1,17 @@
 import { useRef, useState } from "react";
+import CameraSelect from "./CameraSelect";
 import "./UploadSection.css";
 
-function UploadSection({ scanState, onFileSelect, onClassify, onRetry }) {
+function UploadSection({
+  scanState,
+  onFileSelect,
+  onClassify,
+  onRetry,
+  cameras,
+  selectedCameraId,
+  onSelectCamera,
+  onAddCamera,
+}) {
   const fileInputRef = useRef(null);
   const [fileName, setFileName] = useState("");
 
@@ -57,9 +67,12 @@ function UploadSection({ scanState, onFileSelect, onClassify, onRetry }) {
       </p>
 
       <div className="upload-controls">
-        <select className="upload-camera-select" defaultValue="Camera">
-          <option value="Camera">Camera</option>
-        </select>
+        <CameraSelect
+          cameras={cameras}
+          selectedCameraId={selectedCameraId}
+          onSelect={(camera) => onSelectCamera(camera.id)}
+          onAddCamera={onAddCamera}
+        />
 
         <button className="upload-browse-button" onClick={handleBrowseClick}>
           {fileName ? fileName : "Browse Files"}
@@ -82,6 +95,12 @@ function UploadSection({ scanState, onFileSelect, onClassify, onRetry }) {
         <p className="upload-inline-error">
           Please select a camera before classifying. Unsupported file type
           may also not be allowed.
+        </p>
+      )}
+
+      {scanState === "no-camera-error" && (
+        <p className="upload-inline-error">
+          Please select a camera location before classifying.
         </p>
       )}
     </div>

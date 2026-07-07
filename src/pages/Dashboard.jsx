@@ -4,10 +4,13 @@ import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
 import BottomPanels from "../components/BottomPanels";
 import ScanModal from "../components/ScanModal";
+import InfoSections from "../components/InfoSections";
+import AddCameraModal from "../components/AddCameraModal";
 import { mockScanResult } from "../data/mockScans";
+import { initialCameras } from "../data/mockCameras";
 import "./Dashboard.css";
 
-// scanState: "idle" | "loading" | "success" | "error"
+// scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
@@ -15,17 +18,28 @@ function Dashboard() {
   const [modalScan, setModalScan] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
+  const [cameras, setCameras] = useState(initialCameras);
+  const [selectedCameraId, setSelectedCameraId] = useState(null);
+  const [showAddCameraModal, setShowAddCameraModal] = useState(false);
+
   const handleFileSelect = (file) => {
     setSelectedFile(file);
   };
 
   const handleClassify = () => {
+    if (!selectedCameraId) {
+      setScanState("no-camera-error");
+      return;
+    }
+
     if (!selectedFile) {
       setScanState("no-file-error");
       return;
     }
 
     setScanState("loading");
+
+    const selectedCamera = cameras.find((cam) => cam.id === selectedCameraId);
 
     // Simulated backend call — replace with real API call later
     setTimeout(() => {
@@ -38,6 +52,8 @@ function Dashboard() {
 
       const result = {
         ...mockScanResult,
+        location: selectedCamera ? selectedCamera.location : mockScanResult.location,
+        cameraName: selectedCamera ? selectedCamera.name : "Unknown Camera",
         fileName: selectedFile.name,
         fileUrl: URL.createObjectURL(selectedFile),
         fileType: selectedFile.type.startsWith("video") ? "Video" : "Image",
@@ -67,11 +83,16 @@ function Dashboard() {
     setModalScan(null);
   };
 
+  const handleAddCamera = (newCamera) => {
+    setCameras((prev) => [...prev, newCamera]);
+    setSelectedCameraId(newCamera.id);
+  };
+
   return (
     <div className="dashboard-page">
       <NavBar />
 
-      <section id="overview" className="dashboard-hero">
+      <div className="dashboard-hero">
         <h1 className="dashboard-title">
           See road risk before it becomes an accident
         </h1>
@@ -80,7 +101,7 @@ function Dashboard() {
           damage and traffic, and scores accident risk automatically — so LGU
           teams know exactly where to act first.
         </p>
-      </section>
+      </div>
 
       <div className="dashboard-content">
         {scanState === "success" && currentScan ? (
@@ -91,6 +112,10 @@ function Dashboard() {
             onFileSelect={handleFileSelect}
             onClassify={handleClassify}
             onRetry={handleRetry}
+            cameras={cameras}
+            selectedCameraId={selectedCameraId}
+            onSelectCamera={setSelectedCameraId}
+            onAddCamera={() => setShowAddCameraModal(true)}
           />
         )}
 
@@ -100,8 +125,17 @@ function Dashboard() {
         />
       </div>
 
+      <InfoSections />
+
       {modalScan && (
         <ScanModal scan={modalScan} onClose={handleCloseModal} />
+      )}
+
+      {showAddCameraModal && (
+        <AddCameraModal
+          onClose={() => setShowAddCameraModal(false)}
+          onAddCamera={handleAddCamera}
+        />
       )}
     </div>
   );

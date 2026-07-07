@@ -22,17 +22,8 @@
 .upload-controls {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   gap: 12px;
-}
-
-.upload-camera-select {
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  background-color: #ffffff;
-  color: #1a1a1a;
-  font-size: 14px;
-  cursor: pointer;
 }
 
 .upload-browse-button {
@@ -178,4 +169,18 @@
 
 .upload-retry-button:hover {
   opacity: 0.85;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .upload-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .camera-select,
+  .upload-browse-button,
+  .upload-classify-button {
+    max-width: 100%;
+  }
 }
