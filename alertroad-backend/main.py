@@ -1,9 +1,10 @@
+import random
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import Camera, ScanResult, User
-from schemas import CameraSchema, ScanResultSchema, UserCreate, UserLogin, Token
+from schemas import CameraSchema, ScanResultSchema, ScanCreate, UserCreate, UserLogin, Token
 from auth import hash_password, verify_password, create_access_token
 from typing import List
 
@@ -52,4 +53,34 @@ def get_cameras(db: Session = Depends(get_db)):
 
 @app.get("/api/scans", response_model=List[ScanResultSchema])
 def get_scans(db: Session = Depends(get_db)):
-    return db.query(ScanResult).all()
+    return db.query(ScanResult).order_by(ScanResult.id.desc()).all()
+
+@app.post("/api/scans", response_model=ScanResultSchema)
+def create_scan(scan: ScanCreate, db: Session = Depends(get_db)):
+    # PLACEHOLDER: replace this block once the real detection model is ready.
+    # It should take an uploaded image/video and return real counts instead.
+    potholes = random.randint(0, 6)
+    cracks = random.randint(0, 6)
+    confidence = random.randint(70, 99)
+    traffic = random.randint(0, 30)
+
+    total_damage = potholes + cracks
+    if total_damage >= 6:
+        risk_level = "High"
+    elif total_damage >= 3:
+        risk_level = "Medium"
+    else:
+        risk_level = "Low"
+
+    new_scan = ScanResult(
+        location=scan.location,
+        risk_level=risk_level,
+        potholes=potholes,
+        cracks=cracks,
+        confidence=confidence,
+        traffic=traffic,
+    )
+    db.add(new_scan)
+    db.commit()
+    db.refresh(new_scan)
+    return new_scan

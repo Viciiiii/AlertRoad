@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
@@ -6,9 +6,10 @@ import BottomPanels from "../components/BottomPanels";
 import ScanModal from "../components/ScanModal";
 import InfoSections from "../components/InfoSections";
 import AddCameraModal from "../components/AddCameraModal";
-import { mockScanResult } from "../data/mockScans";
 import { initialCameras } from "../data/mockCameras";
 import "./Dashboard.css";
+
+const API_URL = "http://localhost:8000";
 
 // scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
@@ -22,11 +23,38 @@ function Dashboard() {
   const [selectedCameraId, setSelectedCameraId] = useState(null);
   const [showAddCameraModal, setShowAddCameraModal] = useState(false);
 
+  // Load past scans from the database when the dashboard first mounts
+  useEffect(() => {
+    const loadScans = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/scans`);
+        if (!response.ok) return;
+        const data = await response.json();
+
+        const formatted = data.map((scan) => ({
+          ...scan,
+          riskLevel: scan.risk_level,
+          fileUrl: null,
+          fileType: "Image",
+          cameraName: null,
+          lat: null,
+          lng: null,
+        }));
+
+        setRecentScans(formatted);
+      } catch (err) {
+        console.error("Failed to load past scans:", err);
+      }
+    };
+
+    loadScans();
+  }, []);
+
   const handleFileSelect = (file) => {
     setSelectedFile(file);
   };
 
-  const handleClassify = () => {
+  const handleClassify = async () => {
     if (!selectedCameraId) {
       setScanState("no-camera-error");
       return;
@@ -40,19 +68,25 @@ function Dashboard() {
     setScanState("loading");
 
     const selectedCamera = cameras.find((cam) => cam.id === selectedCameraId);
+    const location = selectedCamera ? selectedCamera.location : "Unknown location";
 
-    // Simulated backend call — replace with real API call later
-    setTimeout(() => {
-      const isSuccess = Math.random() > 0.15; // simulate occasional server failure
+    try {
+      const response = await fetch(`${API_URL}/api/scans`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ location }),
+      });
 
-      if (!isSuccess) {
+      if (!response.ok) {
         setScanState("error");
         return;
       }
 
+      const saved = await response.json();
+
       const result = {
-        ...mockScanResult,
-        location: selectedCamera ? selectedCamera.location : mockScanResult.location,
+        ...saved,
+        riskLevel: saved.risk_level,
         cameraName: selectedCamera ? selectedCamera.name : "Unknown Camera",
         lat: selectedCamera ? selectedCamera.lat : null,
         lng: selectedCamera ? selectedCamera.lng : null,
@@ -64,7 +98,10 @@ function Dashboard() {
       setCurrentScan(result);
       setRecentScans((prev) => [result, ...prev]);
       setScanState("success");
-    }, 2000);
+    } catch (err) {
+      console.error("Classify request failed:", err);
+      setScanState("error");
+    }
   };
 
   const handleRetry = () => {
