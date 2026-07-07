@@ -1,10 +1,11 @@
 import random
+import uuid
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import Camera, ScanResult, User
-from schemas import CameraSchema, ScanResultSchema, ScanCreate, UserCreate, UserLogin, Token
+from schemas import CameraSchema, CameraCreate, ScanResultSchema, ScanCreate, UserCreate, UserLogin, Token
 from auth import hash_password, verify_password, create_access_token
 from typing import List
 
@@ -51,6 +52,30 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 def get_cameras(db: Session = Depends(get_db)):
     return db.query(Camera).all()
 
+@app.post("/api/cameras", response_model=CameraSchema)
+def create_camera(camera: CameraCreate, db: Session = Depends(get_db)):
+    new_camera = Camera(
+        id=str(uuid.uuid4()),
+        name=camera.name,
+        location=camera.location,
+        lat=camera.lat,
+        lng=camera.lng,
+    )
+    db.add(new_camera)
+    db.commit()
+    db.refresh(new_camera)
+    return new_camera
+
+@app.delete("/api/cameras/{camera_id}")
+def delete_camera(camera_id: str, db: Session = Depends(get_db)):
+    camera = db.query(Camera).filter(Camera.id == camera_id).first()
+    if not camera:
+        raise HTTPException(status_code=404, detail="Camera not found")
+
+    db.delete(camera)
+    db.commit()
+    return {"message": "Camera deleted"}
+
 @app.get("/api/scans", response_model=List[ScanResultSchema])
 def get_scans(db: Session = Depends(get_db)):
     return db.query(ScanResult).order_by(ScanResult.id.desc()).all()
@@ -58,7 +83,6 @@ def get_scans(db: Session = Depends(get_db)):
 @app.post("/api/scans", response_model=ScanResultSchema)
 def create_scan(scan: ScanCreate, db: Session = Depends(get_db)):
     # PLACEHOLDER: replace this block once the real detection model is ready.
-    # It should take an uploaded image/video and return real counts instead.
     potholes = random.randint(0, 6)
     cracks = random.randint(0, 6)
     confidence = random.randint(70, 99)

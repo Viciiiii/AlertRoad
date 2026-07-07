@@ -41,7 +41,6 @@ function AddCameraModal({ onClose, onAddCamera }) {
     }
 
     onAddCamera({
-      id: `cam-${Date.now()}`,
       name: name.trim(),
       location: selectedLocation.address,
       lat: selectedLocation.lat,

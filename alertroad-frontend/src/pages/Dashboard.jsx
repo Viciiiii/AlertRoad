@@ -6,7 +6,6 @@ import BottomPanels from "../components/BottomPanels";
 import ScanModal from "../components/ScanModal";
 import InfoSections from "../components/InfoSections";
 import AddCameraModal from "../components/AddCameraModal";
-import { initialCameras } from "../data/mockCameras";
 import "./Dashboard.css";
 
 const API_URL = "http://localhost:8000";
@@ -19,11 +18,11 @@ function Dashboard() {
   const [modalScan, setModalScan] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const [cameras, setCameras] = useState(initialCameras);
+  const [cameras, setCameras] = useState([]);
   const [selectedCameraId, setSelectedCameraId] = useState(null);
   const [showAddCameraModal, setShowAddCameraModal] = useState(false);
 
-  // Load past scans from the database when the dashboard first mounts
+  // Load past scans and registered cameras from the database on mount
   useEffect(() => {
     const loadScans = async () => {
       try {
@@ -47,7 +46,19 @@ function Dashboard() {
       }
     };
 
+    const loadCameras = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/cameras`);
+        if (!response.ok) return;
+        const data = await response.json();
+        setCameras(data);
+      } catch (err) {
+        console.error("Failed to load cameras:", err);
+      }
+    };
+
     loadScans();
+    loadCameras();
   }, []);
 
   const handleFileSelect = (file) => {
@@ -122,14 +133,43 @@ function Dashboard() {
     setModalScan(null);
   };
 
-  const handleAddCamera = (newCamera) => {
-    setCameras((prev) => [...prev, newCamera]);
-    setSelectedCameraId(newCamera.id);
+  const handleAddCamera = async (newCamera) => {
+    try {
+      const response = await fetch(`${API_URL}/api/cameras`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCamera),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to save camera");
+        return;
+      }
+
+      const saved = await response.json();
+      setCameras((prev) => [...prev, saved]);
+      setSelectedCameraId(saved.id);
+    } catch (err) {
+      console.error("Add camera request failed:", err);
+    }
   };
 
-  const handleDeleteCamera = (cameraId) => {
-    setCameras((prev) => prev.filter((cam) => cam.id !== cameraId));
-    setSelectedCameraId((prev) => (prev === cameraId ? null : prev));
+  const handleDeleteCamera = async (cameraId) => {
+    try {
+      const response = await fetch(`${API_URL}/api/cameras/${cameraId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        console.error("Failed to delete camera");
+        return;
+      }
+
+      setCameras((prev) => prev.filter((cam) => cam.id !== cameraId));
+      setSelectedCameraId((prev) => (prev === cameraId ? null : prev));
+    } catch (err) {
+      console.error("Delete camera request failed:", err);
+    }
   };
 
   return (

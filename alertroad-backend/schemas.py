@@ -38,3 +38,9 @@ class Token(BaseModel):
 
 class ScanCreate(BaseModel):
     location: str
+
+class CameraCreate(BaseModel):
+    name: str
+    location: str
+    lat: float
+    lng: float
