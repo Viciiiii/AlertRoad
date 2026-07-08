@@ -1,17 +1,35 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./NavBar.css";
 
 function NavBar() {
   const { logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isOnDashboard = location.pathname === "/dashboard";
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+  const handleLogoClick = () => {
+    // "unless he's already in the dashboard" - do nothing if we're already there
+    if (!isOnDashboard) {
+      navigate("/dashboard");
+    }
+  };
+
   const scrollToSection = (id) => {
+    if (!isOnDashboard) {
+      // Not on the dashboard yet (e.g. we're on /admin) - navigate there first,
+      // and tell Dashboard which section to scroll to once it mounts.
+      navigate("/dashboard", { state: { scrollTo: id } });
+      return;
+    }
+
+    // Already on the dashboard - scroll directly.
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
@@ -20,7 +38,10 @@ function NavBar() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">
+      <div
+        className={`navbar-logo${!isOnDashboard ? " navbar-logo-clickable" : ""}`}
+        onClick={handleLogoClick}
+      >
         <span className="logo-diamond" />
         <span className="logo-text">ALERTROAD</span>
       </div>

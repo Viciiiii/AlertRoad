@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
@@ -14,6 +15,8 @@ const API_URL = "http://localhost:8000";
 // scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
   const { isAdmin } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
@@ -29,6 +32,21 @@ function Dashboard() {
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   });
+
+  // If we were redirected here from another page (e.g. clicking "Features"
+  // while on /admin), scroll to the requested section once this page has
+  // rendered, then clear the instruction so it doesn't fire again later
+  // (e.g. if the user navigates back/forward).
+  useEffect(() => {
+    const targetId = location.state?.scrollTo;
+    if (targetId) {
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // Load past scans and registered cameras from the database on mount
   useEffect(() => {

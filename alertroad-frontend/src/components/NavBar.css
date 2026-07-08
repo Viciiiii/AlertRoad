@@ -13,6 +13,10 @@
   gap: 8px;
 }
 
+.navbar-logo-clickable {
+  cursor: pointer;
+}
+
 .logo-diamond {
   width: 16px;
   height: 16px;
