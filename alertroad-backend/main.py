@@ -5,8 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import Camera, ScanResult, User
-from schemas import CameraSchema, CameraCreate, ScanResultSchema, ScanCreate, UserCreate, UserLogin, Token
-from auth import hash_password, verify_password, create_access_token
+from schemas import (
+    CameraSchema, CameraCreate,
+    ScanResultSchema, ScanCreate,
+    UserCreate, UserLogin, Token, UserSchema,
+)
+from auth import (
+    hash_password, verify_password, create_access_token,
+    get_current_user, get_current_admin,
+)
 from typing import List
 
 app = FastAPI()
@@ -25,19 +32,7 @@ Base.metadata.create_all(bind=engine)
 def root():
     return {"message": "AlertRoad API is running"}
 
-@app.post("/api/register", response_model=Token)
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == user.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    new_user = User(email=user.email, hashed_password=hash_password(user.password))
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    token = create_access_token({"sub": new_user.email})
-    return {"access_token": token}
+# --- Auth ---
 
 @app.post("/api/login", response_model=Token)
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
@@ -45,15 +40,64 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
     if not user or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
 
-    token = create_access_token({"sub": user.email})
+    token = create_access_token({"sub": user.email, "is_admin": user.is_admin})
     return {"access_token": token}
+
+# --- Staff management (admin-only) ---
+
+@app.post("/api/users", response_model=UserSchema)
+def create_staff(
+    user: UserCreate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    existing = db.query(User).filter(User.email == user.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    new_user = User(
+        email=user.email,
+        hashed_password=hash_password(user.password),
+        is_admin=False,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+@app.get("/api/users", response_model=List[UserSchema])
+def list_users(db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
+    return db.query(User).all()
+
+@app.delete("/api/users/{user_id}")
+def delete_staff(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="You can't delete your own account")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted"}
+
+# --- Cameras ---
 
 @app.get("/api/cameras", response_model=List[CameraSchema])
 def get_cameras(db: Session = Depends(get_db)):
     return db.query(Camera).all()
 
 @app.post("/api/cameras", response_model=CameraSchema)
-def create_camera(camera: CameraCreate, db: Session = Depends(get_db)):
+def create_camera(
+    camera: CameraCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),  # staff or admin, just needs to be logged in
+):
     new_camera = Camera(
         id=str(uuid.uuid4()),
         name=camera.name,
@@ -67,7 +111,11 @@ def create_camera(camera: CameraCreate, db: Session = Depends(get_db)):
     return new_camera
 
 @app.delete("/api/cameras/{camera_id}")
-def delete_camera(camera_id: str, db: Session = Depends(get_db)):
+def delete_camera(
+    camera_id: str,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
     camera = db.query(Camera).filter(Camera.id == camera_id).first()
     if not camera:
         raise HTTPException(status_code=404, detail="Camera not found")
@@ -76,12 +124,18 @@ def delete_camera(camera_id: str, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Camera deleted"}
 
+# --- Scans ---
+
 @app.get("/api/scans", response_model=List[ScanResultSchema])
 def get_scans(db: Session = Depends(get_db)):
     return db.query(ScanResult).order_by(ScanResult.id.desc()).all()
 
 @app.post("/api/scans", response_model=ScanResultSchema)
-def create_scan(scan: ScanCreate, db: Session = Depends(get_db)):
+def create_scan(
+    scan: ScanCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),  # staff or admin, just needs to be logged in
+):
     camera = db.query(Camera).filter(Camera.id == scan.camera_id).first()
     if not camera:
         raise HTTPException(status_code=404, detail="Camera not found")
@@ -115,3 +169,17 @@ def create_scan(scan: ScanCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_scan)
     return new_scan
+
+@app.delete("/api/scans/{scan_id}")
+def delete_scan(
+    scan_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    scan = db.query(ScanResult).filter(ScanResult.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+
+    db.delete(scan)
+    db.commit()
+    return {"message": "Scan deleted"}

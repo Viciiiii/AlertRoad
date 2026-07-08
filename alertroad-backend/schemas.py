@@ -50,3 +50,12 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class UserSchema(BaseModel):
+    id: int
+    email: str
+    is_admin: bool
+
+    class Config:
+        from_attributes = True
