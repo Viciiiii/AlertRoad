@@ -33,8 +33,12 @@ function Dashboard() {
     lng: "",
   });
 
-  const handleManualLocationChange = (field, value) => {
-    setManualLocation((prev) => ({ ...prev, [field]: value }));
+  const handleManualLocationTextChange = (text) => {
+  setManualLocation((prev) => ({ ...prev, location: text, lat: "", lng: "" }));
+  };
+
+  const handleManualLocationSelect = ({ address, lat, lng }) => {
+  setManualLocation({ location: address, lat, lng });
   };
 
   const authHeaders = () => ({
@@ -259,7 +263,8 @@ function Dashboard() {
               onDeleteCamera={handleDeleteCamera}
               isAdmin={isAdmin}
               manualLocation={manualLocation}
-              onManualLocationChange={handleManualLocationChange}
+              onManualLocationTextChange={handleManualLocationTextChange}
+              onManualLocationSelect={handleManualLocationSelect}
             />
           )}
 
