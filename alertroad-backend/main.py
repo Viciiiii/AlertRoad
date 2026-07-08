@@ -151,9 +151,29 @@ def create_scan(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    camera = db.query(Camera).filter(Camera.id == scan.camera_id).first()
-    if not camera:
-        raise HTTPException(status_code=404, detail="Camera not found")
+    if scan.camera_id:
+        # Fixed CCTV camera flow: look up the registered camera's location.
+        camera = db.query(Camera).filter(Camera.id == scan.camera_id).first()
+        if not camera:
+            raise HTTPException(status_code=404, detail="Camera not found")
+
+        location = camera.location
+        camera_name = camera.name
+        lat = camera.lat
+        lng = camera.lng
+    else:
+        # Handheld/mobile capture flow: no registered camera, so the
+        # location must be sent directly in the request instead.
+        if scan.location is None or scan.lat is None or scan.lng is None:
+            raise HTTPException(
+                status_code=400,
+                detail="location, lat, and lng are required when no camera_id is provided",
+            )
+
+        location = scan.location
+        camera_name = "Handheld Device"
+        lat = scan.lat
+        lng = scan.lng
 
     # PLACEHOLDER: replace this block once the real detection model is ready.
     potholes = random.randint(0, 6)
@@ -170,15 +190,15 @@ def create_scan(
         risk_level = "Low"
 
     new_scan = ScanResult(
-        location=camera.location,
+        location=location,
         risk_level=risk_level,
         potholes=potholes,
         cracks=cracks,
         confidence=confidence,
         traffic=traffic,
-        camera_name=camera.name,
-        lat=camera.lat,
-        lng=camera.lng,
+        camera_name=camera_name,
+        lat=lat,
+        lng=lng,
     )
     db.add(new_scan)
     db.commit()

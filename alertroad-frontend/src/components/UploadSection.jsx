@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import CameraSelect from "./CameraSelect";
+import LocationAutocomplete from "./LocationAutoComplete";
 import "./UploadSection.css";
 
 function UploadSection({
@@ -13,9 +14,16 @@ function UploadSection({
   onAddCamera,
   onDeleteCamera,
   isAdmin,
+  manualLocation,
+  onManualLocationTextChange,
+  onManualLocationSelect,
 }) {
   const fileInputRef = useRef(null);
   const [fileName, setFileName] = useState("");
+  const [locatingDevice, setLocatingDevice] = useState(false);
+  const [locationError, setLocationError] = useState("");
+
+  const isManualMode = selectedCameraId === "manual";
 
   const handleBrowseClick = () => {
     fileInputRef.current?.click();
@@ -27,6 +35,55 @@ function UploadSection({
       setFileName(file.name);
       onFileSelect(file);
     }
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Your browser doesn't support location access.");
+      return;
+    }
+
+    setLocationError("");
+    setLocatingDevice(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Reverse-geocode the coordinates into a human-readable address,
+        // using the same OpenStreetMap/Nominatim service the suggestions
+        // dropdown uses, so this ends up as a normal "selected location"
+        // just like picking one from the list.
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+
+          onManualLocationSelect({
+            address: data.display_name || `${latitude}, ${longitude}`,
+            lat: latitude,
+            lng: longitude,
+          });
+        } catch (err) {
+          // Reverse geocoding failed, but we still have real coordinates -
+          // fall back to showing them directly as the address text.
+          onManualLocationSelect({
+            address: `${latitude}, ${longitude}`,
+            lat: latitude,
+            lng: longitude,
+          });
+        } finally {
+          setLocatingDevice(false);
+        }
+      },
+      () => {
+        setLocationError(
+          "Couldn't get your location. Please search for it instead."
+        );
+        setLocatingDevice(false);
+      }
+    );
   };
 
   if (scanState === "loading") {
@@ -95,6 +152,29 @@ function UploadSection({
         </button>
       </div>
 
+      {isManualMode && (
+        <div className="upload-manual-location">
+          <div className="upload-manual-location-row">
+            <LocationAutocomplete
+              value={manualLocation.location}
+              onChange={onManualLocationTextChange}
+              onSelectLocation={onManualLocationSelect}
+            />
+            <button
+              type="button"
+              className="upload-manual-locate-button"
+              onClick={handleUseMyLocation}
+              disabled={locatingDevice}
+            >
+              {locatingDevice ? "Locating..." : "Use my current location"}
+            </button>
+          </div>
+          {locationError && (
+            <p className="upload-inline-error">{locationError}</p>
+          )}
+        </div>
+      )}
+
       {scanState === "no-file-error" && (
         <p className="upload-inline-error">
           Please select a camera before classifying. Unsupported file type
@@ -105,6 +185,13 @@ function UploadSection({
       {scanState === "no-camera-error" && (
         <p className="upload-inline-error">
           Please select a camera location before classifying.
+        </p>
+      )}
+
+      {scanState === "no-location-error" && (
+        <p className="upload-inline-error">
+          Please select a location from the suggestions list, or use
+          "Use my current location", before classifying.
         </p>
       )}
     </div>

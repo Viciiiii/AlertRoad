@@ -36,7 +36,15 @@ class ScanResultSchema(BaseModel):
 
 
 class ScanCreate(BaseModel):
-    camera_id: str
+    # Fixed CCTV camera flow: camera_id is provided, and its location is
+    # looked up from the cameras table.
+    camera_id: Optional[str] = None
+
+    # Handheld/mobile capture flow: no camera_id, so the location is sent
+    # directly instead (typed manually or filled from the device's GPS).
+    location: Optional[str] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
 
 
 class UserCreate(BaseModel):

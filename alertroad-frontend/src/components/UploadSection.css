@@ -184,3 +184,45 @@
     max-width: 100%;
   }
 }
+
+/* Manual/handheld location field */
+.upload-manual-location {
+  margin-top: 16px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.upload-manual-location-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.upload-manual-location-row .location-autocomplete {
+  flex: 1;
+}
+
+.upload-manual-locate-button {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #f5a623;
+  color: #1a1a1a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.upload-manual-locate-button:hover {
+  opacity: 0.85;
+}
+
+.upload-manual-locate-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

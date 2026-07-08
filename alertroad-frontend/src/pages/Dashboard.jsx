@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
@@ -15,8 +14,6 @@ const API_URL = "http://localhost:8000";
 // scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
   const { isAdmin } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
@@ -28,25 +25,22 @@ function Dashboard() {
   const [selectedCameraId, setSelectedCameraId] = useState(null);
   const [showAddCameraModal, setShowAddCameraModal] = useState(false);
 
+  // Used only when selectedCameraId === "manual" (handheld/mobile capture,
+  // where there's no pre-registered camera to pull a location from).
+  const [manualLocation, setManualLocation] = useState({
+    location: "",
+    lat: "",
+    lng: "",
+  });
+
+  const handleManualLocationChange = (field, value) => {
+    setManualLocation((prev) => ({ ...prev, [field]: value }));
+  };
+
   const authHeaders = () => ({
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   });
-
-  // If we were redirected here from another page (e.g. clicking "Features"
-  // while on /admin), scroll to the requested section once this page has
-  // rendered, then clear the instruction so it doesn't fire again later
-  // (e.g. if the user navigates back/forward).
-  useEffect(() => {
-    const targetId = location.state?.scrollTo;
-    if (targetId) {
-      const el = document.getElementById(targetId);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location, navigate]);
 
   // Load past scans and registered cameras from the database on mount
   useEffect(() => {
@@ -92,9 +86,19 @@ function Dashboard() {
   };
 
   const handleClassify = async () => {
+    const isManualMode = selectedCameraId === "manual";
+
     if (!selectedCameraId) {
       setScanState("no-camera-error");
       return;
+    }
+
+    if (isManualMode) {
+      const { location, lat, lng } = manualLocation;
+      if (!location.trim() || lat === "" || lng === "") {
+        setScanState("no-location-error");
+        return;
+      }
     }
 
     if (!selectedFile) {
@@ -104,13 +108,19 @@ function Dashboard() {
 
     setScanState("loading");
 
-    const selectedCamera = cameras.find((cam) => cam.id === selectedCameraId);
+    const requestBody = isManualMode
+      ? {
+          location: manualLocation.location,
+          lat: parseFloat(manualLocation.lat),
+          lng: parseFloat(manualLocation.lng),
+        }
+      : { camera_id: selectedCameraId };
 
     try {
       const response = await fetch(`${API_URL}/api/scans`, {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ camera_id: selectedCameraId }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -248,6 +258,8 @@ function Dashboard() {
               onAddCamera={() => setShowAddCameraModal(true)}
               onDeleteCamera={handleDeleteCamera}
               isAdmin={isAdmin}
+              manualLocation={manualLocation}
+              onManualLocationChange={handleManualLocationChange}
             />
           )}
 

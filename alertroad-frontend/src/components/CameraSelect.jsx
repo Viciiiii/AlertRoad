@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import "./CameraSelect.css";
 
+const MANUAL_OPTION = {
+  id: "manual",
+  name: "Other / Handheld Device",
+  location: "Enter location manually",
+};
+
 function CameraSelect({
   cameras,
   selectedCameraId,
@@ -22,7 +28,10 @@ function CameraSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedCamera = cameras.find((cam) => cam.id === selectedCameraId);
+  const selectedCamera =
+    selectedCameraId === MANUAL_OPTION.id
+      ? MANUAL_OPTION
+      : cameras.find((cam) => cam.id === selectedCameraId);
 
   const handleSelectCamera = (camera) => {
     onSelect(camera);
@@ -97,6 +106,24 @@ function CameraSelect({
               </div>
             ))
           )}
+
+          <div className="camera-select-divider" />
+
+          <div
+            className={`camera-select-item ${
+              selectedCameraId === MANUAL_OPTION.id ? "selected" : ""
+            }`}
+            onClick={() => handleSelectCamera(MANUAL_OPTION)}
+          >
+            <div className="camera-select-item-text">
+              <span className="camera-select-item-name">
+                📱 {MANUAL_OPTION.name}
+              </span>
+              <span className="camera-select-item-location">
+                {MANUAL_OPTION.location}
+              </span>
+            </div>
+          </div>
 
           <div className="camera-select-divider" />
 
