@@ -5,6 +5,8 @@
   padding: 20px 32px;
   border-bottom: 1px solid #e5e7eb;
   background-color: #ffffff;
+  flex-wrap: wrap;
+  row-gap: 12px;
 }
 
 .navbar-logo {
@@ -79,4 +81,41 @@
 
 .navbar-logout:hover {
   background-color: #f3f4f6;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 16px 20px;
+  }
+
+  .navbar-links {
+    gap: 20px;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-links {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .navbar-link {
+    font-size: 13px;
+  }
+
+  .navbar-actions {
+    gap: 10px;
+  }
+
+  .navbar-admin {
+    font-size: 13px;
+  }
+
+  .navbar-logout {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }

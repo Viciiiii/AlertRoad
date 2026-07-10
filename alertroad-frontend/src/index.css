@@ -4,6 +4,14 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Makes padding/border count INSIDE an element's declared width instead of
+   adding to it — the standard, safer default. Prevents the exact bug we hit
+   in ScanModal.css (width: 100% + padding silently overflowing its
+   container) from happening again anywhere else in the app. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;

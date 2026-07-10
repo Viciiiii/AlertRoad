@@ -145,3 +145,22 @@
   gap: 8px;
   margin-top: 10px;
 }
+
+@media (max-width: 480px) {
+  .staff-content {
+    padding: 32px 16px;
+  }
+
+  .staff-title {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .staff-form {
+    padding: 16px;
+  }
+
+  .staff-row {
+    padding: 12px;
+  }
+}

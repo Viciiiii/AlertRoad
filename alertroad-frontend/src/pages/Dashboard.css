@@ -40,3 +40,21 @@
   margin: 0 auto;
   padding: 0 24px 48px 24px;
 }
+
+@media (max-width: 480px) {
+  .dashboard-hero {
+    padding: 32px 16px 24px 16px;
+  }
+
+  .dashboard-title {
+    font-size: 22px;
+  }
+
+  .dashboard-subtitle {
+    font-size: 14px;
+  }
+
+  .dashboard-content {
+    padding: 0 16px 32px 16px;
+  }
+}

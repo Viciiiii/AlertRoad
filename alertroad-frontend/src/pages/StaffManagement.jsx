@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import NavBar from "../components/NavBar";
 import "./StaffManagement.css";
 
-const API_URL = "http://localhost:8000";
+const API_URL = "";
 
 function StaffManagement() {
   const [users, setUsers] = useState([]);

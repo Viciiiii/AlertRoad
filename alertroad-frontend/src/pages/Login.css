@@ -120,3 +120,18 @@
 .login-button:active {
   opacity: 0.8;
 }
+
+@media (max-width: 480px) {
+  .login-logo {
+    padding: 16px 20px;
+  }
+
+  .login-card {
+    padding: 28px 20px;
+  }
+
+  .login-title {
+    font-size: 22px;
+    margin-bottom: 22px;
+  }
+}

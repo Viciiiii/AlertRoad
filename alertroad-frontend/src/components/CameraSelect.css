@@ -148,3 +148,14 @@
 .camera-select-add:hover {
   background-color: #2a2a2a;
 }
+
+@media (max-width: 480px) {
+  .camera-select-trigger {
+    max-width: 160px;
+  }
+
+  .camera-select-menu {
+    min-width: 220px;
+    max-width: calc(100vw - 48px);
+  }
+}
