@@ -61,31 +61,39 @@ function RiskMap({ scans }) {
         ⛶
       </button>
 
-      <MapContainer
-        center={center}
-        zoom={DEFAULT_ZOOM}
-        scrollWheelZoom={false}
-        className="risk-map-container"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      {/* Only one Leaflet map instance should ever exist in the DOM at a time.
+          Rendering both this small map and the fullscreen modal's map
+          simultaneously caused a real-device bug where the small map's
+          tiles bled through on top of the modal instead of staying hidden
+          behind it — Leaflet's internal rendering doesn't always respect
+          normal CSS stacking the way a plain div would. */}
+      {!isExpanded && (
+        <MapContainer
+          center={center}
+          zoom={DEFAULT_ZOOM}
+          scrollWheelZoom={false}
+          className="risk-map-container"
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
 
-        {scansWithCoords.map((scan, index) => (
-          <Marker
-            key={index}
-            position={[scan.lat, scan.lng]}
-            icon={createTriangleIcon(RISK_COLORS[scan.riskLevel] || RISK_COLORS.Low)}
-          >
-            <Popup>
-              <strong>{scan.location}</strong>
-              <br />
-              Risk: {scan.riskLevel}
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+          {scansWithCoords.map((scan, index) => (
+            <Marker
+              key={index}
+              position={[scan.lat, scan.lng]}
+              icon={createTriangleIcon(RISK_COLORS[scan.riskLevel] || RISK_COLORS.Low)}
+            >
+              <Popup>
+                <strong>{scan.location}</strong>
+                <br />
+                Risk: {scan.riskLevel}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      )}
 
       {isExpanded && (
         <RiskMapModal
