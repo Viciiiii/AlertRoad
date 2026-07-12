@@ -26,7 +26,6 @@ function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
 
       <div className="panel recent-scans-panel">
         <div className="recent-scans-header">
-          <span className="recent-scans-icon">⟳</span>
           <span className="recent-scans-title">Recent Scans</span>
           {isAdmin && recentScans.length > 0 && (
             <button className="recent-scans-clear-all" onClick={onClearAll}>

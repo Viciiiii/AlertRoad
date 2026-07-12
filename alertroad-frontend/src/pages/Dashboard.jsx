@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
@@ -14,6 +15,8 @@ const API_URL = "";
 // scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
   const { isAdmin } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
@@ -96,6 +99,24 @@ function Dashboard() {
     loadScans();
     loadCameras();
   }, []);
+
+  // NavBar's scrollToSection navigates here with { state: { scrollTo: id } }
+  // when the click happened from another page (e.g. Manage Staff) instead of
+  // the dashboard itself. Without this, we'd just land on top of the page —
+  // this is what actually performs the scroll once InfoSections has mounted.
+  useEffect(() => {
+    const scrollToId = location.state?.scrollTo;
+    if (!scrollToId) return;
+
+    const timer = setTimeout(() => {
+      document.getElementById(scrollToId)?.scrollIntoView({ behavior: "smooth" });
+      // Clear the nav state so revisiting/refreshing this route doesn't
+      // scroll again on its own.
+      navigate(location.pathname, { replace: true, state: {} });
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [location.state, location.pathname, navigate]);
 
   const handleFileSelect = (file) => {
     setSelectedFile(file);

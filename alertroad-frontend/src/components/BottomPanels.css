@@ -86,6 +86,13 @@
 
 /* --- Recent Scans --- */
 
+/* .recent-scans-rows already has overflow-y:auto, but that only kicks in
+   once its ancestor chain has a bounded height — without this, the panel
+   just grows taller with every extra scan instead of scrolling. */
+.recent-scans-panel {
+  max-height: 420px;
+}
+
 .recent-scans-header {
   display: flex;
   align-items: center;
@@ -108,12 +115,6 @@
 .recent-scans-clear-all:hover {
   background-color: #e02424;
   color: #ffffff;
-}
-
-.recent-scans-icon {
-  color: #9ca3af;
-  font-size: 16px;
-  line-height: 1;
 }
 
 .recent-scans-title {
@@ -229,6 +230,10 @@
 @media (max-width: 480px) {
   .panel {
     min-height: 180px;
+  }
+
+  .recent-scans-panel {
+    max-height: 340px;
   }
 
   .recent-scans-header,
