@@ -11,7 +11,6 @@ const RISK_COLORS = {
 
 function ScanModal({ scan, onClose, onDelete, isAdmin }) {
   const [showAnnotated, setShowAnnotated] = useState(Boolean(scan.annotatedFileUrl));
-  const [activeTrafficEntry, setActiveTrafficEntry] = useState(null);
   const videoRef = useRef(null);
   const hasAnnotated = Boolean(scan.annotatedFileUrl);
   const isVideo = scan.fileType === "Video";
@@ -23,18 +22,6 @@ function ScanModal({ scan, onClose, onDelete, isAdmin }) {
   // losing loaded metadata, which is what made seeking unreliable before.
   const handleTimelineSeek = (timestampSec) => {
     setShowAnnotated(true);
-
-    // See ScanResult.jsx: look up the nearest sampled timeline entry so the
-    // "vehicles at this moment" readout reflects that exact frame, not the
-    // headline peak-across-the-whole-video number.
-    if (videoTimeline && videoTimeline.length > 0) {
-      const nearest = videoTimeline.reduce((closest, entry) =>
-        Math.abs(entry.timestamp_sec - timestampSec) < Math.abs(closest.timestamp_sec - timestampSec)
-          ? entry
-          : closest
-      );
-      setActiveTrafficEntry(nearest);
-    }
 
     const videoEl = videoRef.current;
     if (!videoEl) return;
@@ -139,14 +126,6 @@ function ScanModal({ scan, onClose, onDelete, isAdmin }) {
             onSeek={handleTimelineSeek}
             videoRef={videoRef}
           />
-        )}
-
-        {isVideo && videoTimeline && (
-          <p className="scan-modal-media-note">
-            {activeTrafficEntry
-              ? `${activeTrafficEntry.traffic} vehicle${activeTrafficEntry.traffic === 1 ? "" : "s"} at ${activeTrafficEntry.timestamp_sec}s`
-              : "Click a point on the timeline to see vehicles at that moment"}
-          </p>
         )}
         </div>
 

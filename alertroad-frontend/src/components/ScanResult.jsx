@@ -7,7 +7,6 @@ function ScanResult({ scan, onUploadAnother }) {
   // Default to the annotated (bounding-box) view when one exists, since
   // that's the more useful view — falls back to the raw upload otherwise.
   const [showAnnotated, setShowAnnotated] = useState(Boolean(scan.annotatedFileUrl));
-  const [activeTrafficEntry, setActiveTrafficEntry] = useState(null);
   const videoRef = useRef(null);
 
   const hasAnnotated = Boolean(scan.annotatedFileUrl);
@@ -22,18 +21,6 @@ function ScanResult({ scan, onUploadAnother }) {
   // remount losing already-loaded metadata (the old bug this replaces).
   const handleTimelineSeek = (timestampSec) => {
     setShowAnnotated(true); // jump to the boxes-visible view
-
-    // Find the sampled timeline entry nearest the clicked timestamp so the
-    // "vehicles at this moment" readout reflects that exact frame's own
-    // vehicle count, not the headline peak-across-the-whole-video number.
-    if (videoTimeline && videoTimeline.length > 0) {
-      const nearest = videoTimeline.reduce((closest, entry) =>
-        Math.abs(entry.timestamp_sec - timestampSec) < Math.abs(closest.timestamp_sec - timestampSec)
-          ? entry
-          : closest
-      );
-      setActiveTrafficEntry(nearest);
-    }
 
     const videoEl = videoRef.current;
     if (!videoEl) return;
@@ -129,14 +116,6 @@ function ScanResult({ scan, onUploadAnother }) {
             onSeek={handleTimelineSeek}
             videoRef={videoRef}
           />
-        )}
-
-        {isVideo && videoTimeline && (
-          <p className="scan-media-note">
-            {activeTrafficEntry
-              ? `${activeTrafficEntry.traffic} vehicle${activeTrafficEntry.traffic === 1 ? "" : "s"} at ${activeTrafficEntry.timestamp_sec}s`
-              : "Click a point on the timeline to see vehicles at that moment"}
-          </p>
         )}
         </div>
 
