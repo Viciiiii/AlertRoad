@@ -251,6 +251,31 @@ def delete_scan(
     db.commit()
     return {"message": "Scan deleted"}
 
+@app.delete("/api/scans")
+def delete_all_scans(
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    # Bulk version of delete_scan above — same per-file cleanup logic, just
+    # looped over every row instead of one. Kept as a single DB commit at
+    # the end (not one commit per row) so a mid-loop failure can't leave
+    # the table half-cleared relative to what's on disk.
+    scans = db.query(ScanResult).all()
+    for scan in scans:
+        for filename in (scan.image_filename, scan.annotated_image_filename):
+            if not filename:
+                continue
+            file_path = os.path.join(UPLOAD_DIR, filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError as e:
+                    print(f"Warning: could not delete file {file_path}: {e}")
+        db.delete(scan)
+
+    db.commit()
+    return {"message": f"Deleted {len(scans)} scan(s)"}
+
 FRONTEND_DIST = os.path.join("..", "alertroad-frontend", "dist")
 
 app.mount(

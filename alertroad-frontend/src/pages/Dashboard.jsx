@@ -257,6 +257,35 @@ function Dashboard() {
   }
 };
 
+  const handleClearAllScans = async () => {
+    if (
+      !window.confirm(
+        `Delete all ${recentScans.length} scan record(s)? This can't be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/scans`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to clear all scans");
+        return;
+      }
+
+      setRecentScans([]);
+      setModalScan(null);
+      setCurrentScan(null);
+      setScanState("idle");
+    } catch (err) {
+      console.error("Clear all scans request failed:", err);
+    }
+  };
+
   return (
     <div className="dashboard-page">
       <NavBar />
@@ -297,6 +326,8 @@ function Dashboard() {
           <BottomPanels
             recentScans={recentScans}
             onSelectScan={handleOpenModal}
+            isAdmin={isAdmin}
+            onClearAll={handleClearAllScans}
           />
         </div>
       </div>

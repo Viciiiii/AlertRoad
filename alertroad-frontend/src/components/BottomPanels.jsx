@@ -1,7 +1,7 @@
 import "./BottomPanels.css";
 import RiskMap from "./RiskMap";
 
-function BottomPanels({ recentScans, onSelectScan }) {
+function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
   return (
     <div className="bottom-panels">
       <div className="panel road-risk-panel">
@@ -28,6 +28,11 @@ function BottomPanels({ recentScans, onSelectScan }) {
         <div className="recent-scans-header">
           <span className="recent-scans-icon">⟳</span>
           <span className="recent-scans-title">Recent Scans</span>
+          {isAdmin && recentScans.length > 0 && (
+            <button className="recent-scans-clear-all" onClick={onClearAll}>
+              Clear all
+            </button>
+          )}
         </div>
 
         <div className="recent-scans-body">
