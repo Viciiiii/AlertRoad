@@ -1,3 +1,14 @@
+import { useState, useRef } from "react";
+import "./ScanModal.css";
+import VideoTimeline from "./VideoTimeline";
+import DetectionOverlay from "./DetectionOverlay";
+
+const RISK_COLORS = {
+  High: "#7a1c1c",
+  Medium: "#d3ad04",
+  Low: "#098d2e",
+};
+
 function ScanModal({ scan, onClose, onDelete, isAdmin }) {
   const [showAnnotated, setShowAnnotated] = useState(Boolean(scan.annotatedFileUrl));
   const [activeTrafficEntry, setActiveTrafficEntry] = useState(null);

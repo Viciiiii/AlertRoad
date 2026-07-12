@@ -63,7 +63,14 @@ function Dashboard() {
             : null,
           damageDetected: scan.damage_detected,
           riskReason: scan.risk_reason,
-          fileType: "Image",
+          // Right after a fresh upload (handleClassify below), fileType
+          // comes from the browser's File.type on the actual selected
+          // file. On page load/refresh we only have the DB row, so derive
+          // it from the saved filename's extension instead — matching the
+          // formats UploadSection actually accepts (mp4/mov = Video).
+          fileType: /\.(mp4|mov)$/i.test(scan.image_filename || "")
+            ? "Video"
+            : "Image",
           cameraName: scan.camera_name,
           lat: scan.lat,
           lng: scan.lng,
