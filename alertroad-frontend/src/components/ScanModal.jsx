@@ -46,19 +46,16 @@ function ScanModal({ scan, onClose, onDelete, isAdmin }) {
     const doSeek = () => {
       videoEl.pause();
       const onSeeked = () => {
-        console.log("[TEMP DEBUG] seeked event fired, currentTime now:", videoEl.currentTime);
         videoEl.removeEventListener("seeked", onSeeked);
         videoEl.play();
       };
       videoEl.addEventListener("seeked", onSeeked, { once: true });
       videoEl.currentTime = clampedTarget;
-      console.log("[TEMP DEBUG] currentTime right after assignment:", videoEl.currentTime);
     };
 
     if (videoEl.readyState >= 1) {
       doSeek();
     } else {
-      console.log("[TEMP DEBUG] readyState < 1, waiting for loadedmetadata");
       videoEl.addEventListener("loadedmetadata", doSeek, { once: true });
     }
   };

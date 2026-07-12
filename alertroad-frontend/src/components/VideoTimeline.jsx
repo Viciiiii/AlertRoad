@@ -81,17 +81,6 @@ function VideoTimeline({ timeline, durationSec, onSeek, videoRef }) {
     if (!trackEl) return;
     const rect = trackEl.getBoundingClientRect();
     const fraction = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-    // TEMP DEBUG: log the raw numbers behind the seek so we can see in
-    // devtools whether the bug is in this calculation or downstream in
-    // the actual video.currentTime assignment. Strip once seeking works.
-    console.log("[TEMP DEBUG] track click", {
-      clientX: e.clientX,
-      rectLeft: rect.left,
-      rectWidth: rect.width,
-      fraction,
-      durationSec,
-      computedTarget: fraction * durationSec,
-    });
     onSeek(fraction * durationSec);
   };
 

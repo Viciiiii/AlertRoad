@@ -35,16 +35,6 @@ function ScanResult({ scan, onUploadAnother }) {
     // TEMP DEBUG: trace exactly what the video element reports before and
     // after we touch it, so we can see in devtools whether currentTime is
     // actually taking effect or getting reverted. Strip once seeking works.
-    console.log("[TEMP DEBUG] handleTimelineSeek called", {
-      timestampSec,
-      clampedTarget,
-      readyState: videoEl.readyState,
-      videoElDuration: videoEl.duration,
-      currentTimeBefore: videoEl.currentTime,
-      networkState: videoEl.networkState,
-      src: videoEl.currentSrc,
-    });
-
     const doSeek = () => {
       // Pausing first, then waiting for the browser's own "seeked" event
       // before calling play(), avoids a race in Chrome/Edge where setting
@@ -54,19 +44,16 @@ function ScanResult({ scan, onUploadAnother }) {
       // (looks like the video "repeating" instead of jumping).
       videoEl.pause();
       const onSeeked = () => {
-        console.log("[TEMP DEBUG] seeked event fired, currentTime now:", videoEl.currentTime);
         videoEl.removeEventListener("seeked", onSeeked);
         videoEl.play();
       };
       videoEl.addEventListener("seeked", onSeeked, { once: true });
       videoEl.currentTime = clampedTarget;
-      console.log("[TEMP DEBUG] currentTime right after assignment:", videoEl.currentTime);
     };
 
     if (videoEl.readyState >= 1) {
       doSeek();
     } else {
-      console.log("[TEMP DEBUG] readyState < 1, waiting for loadedmetadata");
       videoEl.addEventListener("loadedmetadata", doSeek, { once: true });
     }
   };
