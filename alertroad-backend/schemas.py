@@ -31,6 +31,9 @@ class ScanResultSchema(BaseModel):
     lat: Optional[float] = None
     lng: Optional[float] = None
     image_filename: Optional[str] = None
+    annotated_image_filename: Optional[str] = None
+    damage_detected: Optional[bool] = None
+    risk_reason: Optional[str] = None
     detection_details: Optional[dict] = None
 
     class Config:

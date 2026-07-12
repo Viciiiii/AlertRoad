@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./ScanModal.css";
 
 const RISK_COLORS = {
@@ -7,6 +8,10 @@ const RISK_COLORS = {
 };
 
 function ScanModal({ scan, onClose, onDelete, isAdmin }) {
+  const [showAnnotated, setShowAnnotated] = useState(Boolean(scan.annotatedFileUrl));
+  const hasAnnotated = Boolean(scan.annotatedFileUrl);
+  const isVideo = scan.fileType === "Video";
+
   const handleBackdropClick = () => {
     onClose();
   };
@@ -29,7 +34,34 @@ function ScanModal({ scan, onClose, onDelete, isAdmin }) {
         </button>
 
         <div className="scan-modal-media-wrapper">
-          {scan.fileType === "Video" ? (
+          {hasAnnotated && (
+            <div className="scan-modal-media-toggle">
+              <button
+                className={showAnnotated ? "active" : ""}
+                onClick={() => setShowAnnotated(true)}
+              >
+                Detected damage
+              </button>
+              <button
+                className={!showAnnotated ? "active" : ""}
+                onClick={() => setShowAnnotated(false)}
+              >
+                {isVideo ? "Original video" : "Original image"}
+              </button>
+            </div>
+          )}
+
+          {showAnnotated && hasAnnotated ? (
+            <img
+              className="scan-modal-media"
+              src={scan.annotatedFileUrl}
+              alt={
+                isVideo
+                  ? "Detected road damage, annotated frame from video"
+                  : "Detected road damage with bounding boxes"
+              }
+            />
+          ) : isVideo ? (
             <video className="scan-modal-media" src={scan.fileUrl} controls />
           ) : (
             <img
@@ -37,6 +69,13 @@ function ScanModal({ scan, onClose, onDelete, isAdmin }) {
               src={scan.fileUrl}
               alt="Scanned road"
             />
+          )}
+
+          {hasAnnotated && showAnnotated && isVideo && (
+            <p className="scan-modal-media-note">
+              Showing a single annotated frame extracted from the video, not
+              the full clip.
+            </p>
           )}
         </div>
 
@@ -52,6 +91,19 @@ function ScanModal({ scan, onClose, onDelete, isAdmin }) {
             <p className="scan-modal-risk-location">📍 {scan.location}</p>
             <span className="scan-modal-risk-icon">⚠</span>
           </div>
+
+          {scan.riskReason && (
+            <p
+              className={
+                scan.damageDetected === false
+                  ? "scan-modal-risk-reason scan-modal-risk-reason-warning"
+                  : "scan-modal-risk-reason"
+              }
+            >
+              {scan.damageDetected === false ? "⚠ " : ""}
+              {scan.riskReason}
+            </p>
+          )}
 
           <div className="scan-modal-stats-grid">
             <div className="scan-modal-stat-card">

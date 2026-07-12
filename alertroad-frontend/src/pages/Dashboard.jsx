@@ -58,6 +58,11 @@ function Dashboard() {
           ...scan,
           riskLevel: scan.risk_level,
           fileUrl: scan.image_filename ? `${API_URL}/uploads/${scan.image_filename}` : null,
+          annotatedFileUrl: scan.annotated_image_filename
+            ? `${API_URL}/uploads/${scan.annotated_image_filename}`
+            : null,
+          damageDetected: scan.damage_detected,
+          riskReason: scan.risk_reason,
           fileType: "Image",
           cameraName: scan.camera_name,
           lat: scan.lat,
@@ -150,6 +155,11 @@ function Dashboard() {
         lng: saved.lng,
         fileName: selectedFile.name,
         fileUrl: `${API_URL}/uploads/${saved.image_filename}`,
+        annotatedFileUrl: saved.annotated_image_filename
+          ? `${API_URL}/uploads/${saved.annotated_image_filename}`
+          : null,
+        damageDetected: saved.damage_detected,
+        riskReason: saved.risk_reason,
         fileType: selectedFile.type.startsWith("video") ? "Video" : "Image",
       };
 

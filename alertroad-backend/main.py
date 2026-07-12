@@ -213,6 +213,9 @@ def create_scan(
         lat=lat,
         lng=lng,
         image_filename=unique_filename,
+        annotated_image_filename=prediction["annotated_image_filename"],
+        damage_detected=prediction["damage_detected"],
+        risk_reason=prediction["risk_reason"],
         detection_details=prediction["detection_details"],
     )
     db.add(new_scan)
@@ -234,8 +237,10 @@ def delete_scan(
     # because on Windows, a file being actively streamed (e.g. a video
     # still open in the scan modal) is locked by the OS and can't be
     # deleted yet — we don't want that to block deleting the DB record.
-    if scan.image_filename:
-        file_path = os.path.join(UPLOAD_DIR, scan.image_filename)
+    for filename in (scan.image_filename, scan.annotated_image_filename):
+        if not filename:
+            continue
+        file_path = os.path.join(UPLOAD_DIR, filename)
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)

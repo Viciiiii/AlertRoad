@@ -40,13 +40,14 @@ CONF_THRESHOLD = _metadata["CONF_THRESHOLD"]
 VEHICLE_COCO_CLASSES = {2: "car", 3: "motorcycle", 5: "bus", 7: "truck"}
 VEHICLE_CONF_THRESHOLD = 0.3
 
-# TODO: PLACEHOLDER — replace with the real value once your groupmate
-# re-runs cell 32 of his notebook and sends you the printed
-# "Congestion anomaly threshold" number. This value was computed from his
-# training data's vehicle-count distribution and was never saved to
-# alertroad_metadata.yaml, so this is currently an estimate, not the exact
-# number his Random Forest was actually trained against.
-CONGESTION_UPPER_BOUND = 4.5
+# Congestion anomaly threshold, confirmed from notebook cell 32 and saved
+# to alertroad_metadata.yaml — no longer a placeholder estimate.
+CONGESTION_UPPER_BOUND = _metadata["CONGESTION_UPPER_BOUND"]
+
+# Folder where annotated (bounding-box) images get saved. Lives next to the
+# raw uploads folder so main.py can serve it the same way via StaticFiles.
+ANNOTATED_DIR = os.path.join(os.path.dirname(MODEL_DIR), "uploads", "annotated")
+os.makedirs(ANNOTATED_DIR, exist_ok=True)
 
 # --- Load models once, at import time ---
 print("Loading AlertRoad ML models...")
@@ -102,6 +103,17 @@ def predict_road_risk(file_path):
             image_path, conf=CONF_THRESHOLD, verbose=False
         )[0]
         img_h, img_w = result.orig_shape
+
+        # ---- Annotated image (bounding boxes drawn on damage detections) ----
+        # result.plot() draws whatever boxes are in `result` (i.e. only the
+        # damage model's detections, not the vehicle model's) and returns a
+        # BGR numpy array ready for cv2.imwrite. We save it under a name
+        # derived from the original upload so the caller (main.py) can just
+        # hand the filename straight to the frontend.
+        annotated_bgr = result.plot()
+        annotated_filename = os.path.basename(file_path) + "_annotated.jpg"
+        annotated_path = os.path.join(ANNOTATED_DIR, annotated_filename)
+        cv2.imwrite(annotated_path, annotated_bgr)
 
         bucket_counts = {b: 0 for b in BUCKET_NAMES}
         confidences, box_areas = [], []
@@ -166,8 +178,41 @@ def predict_road_risk(file_path):
             k.replace(" Risk", ""): float(v) for k, v in predicted_proba_raw.items()
         }
 
+        # ---- Explainability: was this risk score driven by actual road
+        # damage, or purely by traffic volume? Surfacing this matters
+        # because a 0-detection photo can still land Medium/High risk from
+        # vehicle count alone, and the UI should say so instead of implying
+        # damage was found.
+        damage_detected = total_anomalies > 0
+
+        if not damage_detected and predicted_risk != "Low":
+            risk_reason = (
+                f"No road damage detected in this image — risk was raised by "
+                f"traffic volume alone ({num_vehicles} vehicles detected, "
+                f"above the {CONGESTION_UPPER_BOUND} congestion threshold)."
+            )
+        elif not damage_detected:
+            risk_reason = (
+                "No road damage detected, and traffic volume is within the "
+                "normal range."
+            )
+        else:
+            risk_reason = (
+                f"Risk based on {total_anomalies} detected damage anomal"
+                f"{'y' if total_anomalies == 1 else 'ies'} "
+                f"({feat['num_potholes']} pothole(s), "
+                f"{feat['num_longitudinal_cracks'] + feat['num_transverse_cracks'] + feat['num_alligator_cracks']} "
+                f"crack(s)) and {num_vehicles} vehicles in traffic context."
+            )
+
         return {
             "risk_level": predicted_risk,
+            "damage_detected": damage_detected,
+            "risk_reason": risk_reason,
+            # Forward slash on purpose (not os.path.join) — this becomes part
+            # of a URL path, not a filesystem path, so it must stay "/" even
+            # if the backend happens to run on Windows.
+            "annotated_image_filename": f"annotated/{annotated_filename}",
             "potholes": feat["num_potholes"],
             "cracks": (
                 feat["num_longitudinal_cracks"]

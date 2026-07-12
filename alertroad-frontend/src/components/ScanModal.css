@@ -45,6 +45,7 @@
 }
 
 .scan-modal-media-wrapper {
+  position: relative;
   border-radius: 8px;
   overflow: hidden;
   background-color: #000000;
@@ -58,6 +59,68 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.scan-modal-media-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.45);
+  padding: 4px;
+  border-radius: 8px;
+  backdrop-filter: blur(2px);
+}
+
+.scan-modal-media-toggle button {
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #e5e5e5;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.scan-modal-media-toggle button:hover {
+  color: #ffffff;
+}
+
+.scan-modal-media-toggle button.active {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+.scan-modal-media-note {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 5px 10px;
+  font-size: 11px;
+  color: #e5e5e5;
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.scan-modal-risk-reason {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #4b5563;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0;
+}
+
+.scan-modal-risk-reason-warning {
+  color: #7a5a1c;
+  background-color: #fdf3e0;
 }
 
 .scan-modal-info {

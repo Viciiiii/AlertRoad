@@ -34,4 +34,7 @@ class ScanResult(Base):
     lat = Column(Float, nullable=True)
     lng = Column(Float, nullable=True)
     image_filename = Column(String, nullable=True)
+    annotated_image_filename = Column(String, nullable=True)
+    damage_detected = Column(Boolean, nullable=True)
+    risk_reason = Column(String, nullable=True)
     detection_details = Column(JSON, nullable=True)
