@@ -14,17 +14,19 @@ const BUCKET_LABELS = {
 // segment boundaries VideoTimeline.jsx uses (each entry's timestamp up to
 // the next entry's timestamp), so the overlay and the colored bar always
 // agree about which moment is "active".
+// Finds the timeline entry closest in time to the given playback time,
+// rather than always the most recent PAST sample — with only ~1 sampled
+// frame per second, always-floor-to-previous meant boxes could visibly lag
+// up to ~1s behind right before the next sample landed. Nearest-match
+// instead centers that error: boxes can now appear up to ~0.5s early or
+// late, but never drift stale for a full second the way floor-matching did.
 function findActiveSegment(timeline, currentTime) {
   if (!timeline || timeline.length === 0) return null;
-  let active = timeline[0];
-  for (let i = 0; i < timeline.length; i++) {
-    if (timeline[i].timestamp_sec <= currentTime) {
-      active = timeline[i];
-    } else {
-      break;
-    }
-  }
-  return active;
+  return timeline.reduce((closest, entry) =>
+    Math.abs(entry.timestamp_sec - currentTime) < Math.abs(closest.timestamp_sec - currentTime)
+      ? entry
+      : closest
+  );
 }
 
 // The <video> element's own box can be bigger than the actual decoded
@@ -70,11 +72,12 @@ function getContainedRect(videoEl) {
 
 /**
  * Renders bounding boxes on top of a playing <video>, matching whichever
- * sampled frame in video_timeline covers the current playback time.
+ * sampled frame in video_timeline is CLOSEST in time to the current
+ * playback position (not necessarily the most recent past one).
  *
  * NOTE: boxes update at sampled-frame granularity (~1/sec, same as the
  * risk timeline bar), not literally every video frame — so a box can
- * appear/disappear up to ~1s before or after the exact real moment.
+ * appear/disappear up to ~0.5s before or after the exact real moment.
  */
 function DetectionOverlay({ videoRef, timeline }) {
   const [rect, setRect] = useState(null);
