@@ -1,5 +1,6 @@
 import "./BottomPanels.css";
 import RiskMap from "./RiskMap";
+import { getRiskColor } from "../utils/riskColors";
 
 function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
   return (
@@ -68,7 +69,10 @@ function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
                     <span className="recent-scans-cell recent-scans-cell-type">
                       {scan.fileType}
                     </span>
-                    <span className="recent-scans-cell recent-scans-cell-risk">
+                    <span
+                      className="recent-scans-cell recent-scans-cell-risk"
+                      style={{ color: getRiskColor(scan.riskLevel) }}
+                    >
                       {scan.riskLevel} Risk
                     </span>
                   </div>

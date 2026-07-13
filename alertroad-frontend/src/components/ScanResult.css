@@ -144,7 +144,6 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
 
 .scan-risk-card {
   position: relative;
-  background-color: #7a1c1c;
   border-radius: 8px;
   padding: 16px 20px;
   color: #ffffff;
@@ -172,7 +171,7 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
   top: 16px;
   right: 20px;
   font-size: 20px;
-  color: #ff8080;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .scan-stats-grid {

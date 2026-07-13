@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import "./ScanResult.css";
 import VideoTimeline from "./VideoTimeline";
 import DetectionOverlay from "./DetectionOverlay";
+import { getRiskColor } from "../utils/riskColors";
 
 function ScanResult({ scan, onUploadAnother }) {
   // Default to the annotated (bounding-box) view when one exists, since
@@ -120,7 +121,10 @@ function ScanResult({ scan, onUploadAnother }) {
         </div>
 
         <div className="scan-info-column">
-          <div className="scan-risk-card">
+          <div
+            className="scan-risk-card"
+            style={{ backgroundColor: getRiskColor(scan.riskLevel) }}
+          >
             <p className="scan-risk-label">Risk Level</p>
             <p className="scan-risk-value">{scan.riskLevel}</p>
             <p className="scan-risk-location">📍 {scan.location}</p>

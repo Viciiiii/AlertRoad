@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./VideoTimeline.css";
+import { RISK_COLORS } from "../utils/riskColors";
 
-// Same traffic-light convention as the Road Risk Map legend (Low/Medium/High).
-const RISK_COLORS = {
-  High: "#ef4444",
-  Medium: "#f59e0b",
-  Low: "#22c55e",
-};
 // No damage detected in that stretch — gray, not "Low risk" green. Low
 // risk still means damage WAS found, just not much of it; no detection at
 // all is a different thing and shouldn't look the same as a real (if

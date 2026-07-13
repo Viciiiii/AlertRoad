@@ -89,15 +89,15 @@
 }
 
 .risk-map-modal-legend-low {
-  background-color: #22c55e;
+  background-color: #098d2e;
 }
 
 .risk-map-modal-legend-medium {
-  background-color: #f5a623;
+  background-color: #d3ad04;
 }
 
 .risk-map-modal-legend-high {
-  background-color: #e02424;
+  background-color: #7a1c1c;
 }
 
 .risk-map-modal-map-wrapper {

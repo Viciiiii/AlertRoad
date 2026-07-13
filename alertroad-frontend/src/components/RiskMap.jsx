@@ -4,12 +4,12 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import RiskMapModal from "./RiskMapModal";
 import "./RiskMap.css";
+import { RISK_COLORS } from "../utils/riskColors";
 
-export const RISK_COLORS = {
-  High: "#e02424",
-  Medium: "#f5a623",
-  Low: "#22c55e",
-};
+// Re-exported so RiskMapModal.jsx's existing `import { RISK_COLORS } from
+// "./RiskMap"` keeps working without needing its own edit — the actual
+// canonical values now live in utils/riskColors.js.
+export { RISK_COLORS };
 
 export function createTriangleIcon(color) {
   const svg = `

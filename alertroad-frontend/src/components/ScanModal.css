@@ -154,7 +154,6 @@ video.scan-modal-media::-webkit-media-controls-time-remaining-display {
 
 .scan-modal-risk-card {
   position: relative;
-  background-color: #7a1c1c;
   border-radius: 8px;
   padding: 14px 18px;
   color: #ffffff;
@@ -182,7 +181,7 @@ video.scan-modal-media::-webkit-media-controls-time-remaining-display {
   top: 14px;
   right: 18px;
   font-size: 18px;
-  color: #ff8080;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .scan-modal-stats-grid {
