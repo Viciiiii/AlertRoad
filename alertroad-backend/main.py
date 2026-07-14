@@ -165,13 +165,24 @@ def get_scans(db: Session = Depends(get_db), current_user: User = Depends(get_cu
 
 # --- Uploaded files (images/videos) ---
 # Replaces the old unauthenticated StaticFiles mount at /uploads. Requires
-# login like every other scan-related endpoint, and uses os.path.basename
-# to strip any directory components from the requested filename so this
-# can't be used to read files outside UPLOAD_DIR (e.g. "../../auth.py").
-@app.get("/api/uploads/{filename}")
-def get_upload(filename: str, current_user: User = Depends(get_current_user)):
-    safe_filename = os.path.basename(filename)
-    file_path = os.path.join(UPLOAD_DIR, safe_filename)
+# login like every other scan-related endpoint. Annotated images are saved
+# under uploads/annotated/ (see ml_model/predict.py's _save_annotated), so
+# this needs to accept that one nested subfolder — a plain {filename}
+# segment can't match a path containing "/" at all (FastAPI 404s before
+# the handler even runs), which previously broke every annotated image.
+# os.path.basename() is still applied to each individual path segment so
+# this can't be used to read files outside UPLOAD_DIR/UPLOAD_DIR/annotated
+# (e.g. "../../auth.py" or "annotated/../../auth.py").
+@app.get("/api/uploads/{filepath:path}")
+def get_upload(filepath: str, current_user: User = Depends(get_current_user)):
+    parts = filepath.split("/")
+    if len(parts) == 1:
+        file_path = os.path.join(UPLOAD_DIR, os.path.basename(parts[0]))
+    elif len(parts) == 2 and parts[0] == "annotated":
+        file_path = os.path.join(UPLOAD_DIR, "annotated", os.path.basename(parts[1]))
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
+
     if not os.path.isfile(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(file_path)

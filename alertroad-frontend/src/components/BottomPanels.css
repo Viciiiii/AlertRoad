@@ -146,6 +146,9 @@
   align-items: center;
   padding-bottom: 4px;
   flex-shrink: 0;
+  /* Matches .recent-scans-rows' reserved scrollbar gutter below, so the
+     header stays aligned with the columns in the scrollable rows. */
+  padding-right: 10px;
 }
 
 .recent-scans-columns-divider {
@@ -161,6 +164,11 @@
   flex-direction: column;
   overflow-y: auto;
   min-height: 0;
+  /* Reserves native scrollbar width as its own gutter (rather than the
+     scrollbar overlapping row content) and adds a little extra breathing
+     room so it doesn't sit flush against the Risk column. */
+  scrollbar-gutter: stable;
+  padding-right: 10px;
 }
 
 .recent-scans-row {
