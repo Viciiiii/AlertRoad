@@ -121,12 +121,48 @@ def _run_frame_pipeline(image_bgr):
     # ---- Vehicle detection (plain COCO model, traffic-exposure context) ----
     vresult = _vehicle_model.predict(image_bgr, conf=VEHICLE_CONF_THRESHOLD, verbose=False)[0]
     num_vehicles = 0
+    vehicle_detections = []
     vboxes = vresult.boxes
     if vboxes is not None and len(vboxes) > 0:
         vcls_ids = vboxes.cls.cpu().numpy().astype(int)
-        for cid in vcls_ids:
+        vconfs = vboxes.conf.cpu().numpy()
+        vxyxy = vboxes.xyxy.cpu().numpy()
+        for cid, vconf, (x1, y1, x2, y2) in zip(vcls_ids, vconfs, vxyxy):
             if int(cid) in VEHICLE_COCO_CLASSES:
                 num_vehicles += 1
+                vehicle_detections.append({
+                    "class_name": VEHICLE_COCO_CLASSES[int(cid)],
+                    "confidence": round(float(vconf), 4),
+                    "bbox_xyxy": [round(float(x1), 1), round(float(y1), 1), round(float(x2), 1), round(float(y2), 1)],
+                })
+                # Cyan boxes for vehicles, distinct from the damage model's
+                # own color-per-class boxes drawn via result.plot() above.
+                cv2.rectangle(
+                    annotated_bgr,
+                    (int(x1), int(y1)),
+                    (int(x2), int(y2)),
+                    (255, 255, 0),
+                    2,
+                )
+                label = f"{VEHICLE_COCO_CLASSES[int(cid)]} {vconf:.2f}"
+                (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+                cv2.rectangle(
+                    annotated_bgr,
+                    (int(x1), int(y1) - th - 6),
+                    (int(x1) + tw + 4, int(y1)),
+                    (255, 255, 0),
+                    -1,
+                )
+                cv2.putText(
+                    annotated_bgr,
+                    label,
+                    (int(x1) + 2, int(y1) - 4),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 0, 0),
+                    1,
+                    cv2.LINE_AA,
+                )
 
     is_congestion_anomaly = int(num_vehicles > CONGESTION_UPPER_BOUND)
     total_anomalies = len(confidences)
@@ -213,6 +249,7 @@ def _run_frame_pipeline(image_bgr):
             "max_confidence": feat["max_confidence"],
             "anomaly_density": feat["anomaly_density"],
             "is_congestion_anomaly": bool(is_congestion_anomaly),
+            "vehicle_detections": vehicle_detections,
             "risk_probabilities": predicted_proba,
             "raw_detections": raw_detections,
         },
