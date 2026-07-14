@@ -347,11 +347,6 @@ function UploadSection({
                 Avoid obstructions, excessive camera movement,
                 glare, and very dark footage.
               </li>
-
-              <li>
-                Keep the road damage visible and reasonably
-                centered in the image or video.
-              </li>
             </ul>
 
             <p className="upload-warning-note">
