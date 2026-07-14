@@ -13,7 +13,9 @@
   flex-direction: column;
 }
 
-/* --- Road Risk Map (unchanged) --- */
+/* =========================================================
+   ROAD RISK MAP
+   ========================================================= */
 
 .panel-header {
   display: flex;
@@ -73,7 +75,7 @@
   background-color: #262626;
   margin: 12px;
   border-radius: 6px;
-  padding: 0; /* overrides .panel-body's 16px so the map fills this box flush */
+  padding: 0;
 }
 
 .panel-empty-text {
@@ -81,14 +83,13 @@
   font-size: 13px;
   text-align: center;
   max-width: 260px;
-  margin: 0 auto; /* centers the box itself, not just the text inside it */
+  margin: 0 auto;
 }
 
-/* --- Recent Scans --- */
+/* =========================================================
+   RECENT SCANS
+   ========================================================= */
 
-/* .recent-scans-rows already has overflow-y:auto, but that only kicks in
-   once its ancestor chain has a bounded height — without this, the panel
-   just grows taller with every extra scan instead of scrolling. */
 .recent-scans-panel {
   max-height: 420px;
 }
@@ -98,6 +99,12 @@
   align-items: center;
   gap: 10px;
   padding: 20px 24px 16px 24px;
+}
+
+.recent-scans-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .recent-scans-clear-all {
@@ -117,64 +124,87 @@
   color: #ffffff;
 }
 
-.recent-scans-title {
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 .recent-scans-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* vertically centers the empty-state text; no effect when
-                               recent-scans-table is present, since that child has
-                               flex: 1 and already fills all available space */
+  justify-content: center;
   padding: 0 24px 20px 24px;
   min-height: 0;
 }
 
+/*
+  The header and rows now use the same scrollable container.
+  This prevents the scrollbar from shifting the row columns.
+*/
 .recent-scans-table {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #555555 transparent;
+}
+
+.recent-scans-table::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recent-scans-table::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recent-scans-table::-webkit-scrollbar-thumb {
+  background-color: #555555;
+  border-radius: 10px;
+}
+
+.recent-scans-table::-webkit-scrollbar-thumb:hover {
+  background-color: #707070;
+}
+
+/*
+  Both the heading and every scan row use exactly the same grid.
+*/
+.recent-scans-columns,
+.recent-scans-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    55px
+    100px
+    90px;
+  align-items: center;
+  column-gap: 0;
 }
 
 .recent-scans-columns {
-  display: flex;
-  align-items: center;
-  padding-bottom: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
   flex-shrink: 0;
-  /* Matches .recent-scans-rows' reserved scrollbar gutter below, so the
-     header stays aligned with the columns in the scrollable rows. */
-  padding-right: 10px;
+  padding: 0 10px 8px 0;
+  border-bottom: 1px solid #333333;
+  background-color: #1e1e1e;
 }
 
 .recent-scans-columns-divider {
-  height: 1px;
-  background-color: #333333;
-  width: 100%;
-  flex-shrink: 0;
+  display: none;
 }
 
 .recent-scans-rows {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  flex: 0 0 auto;
   min-height: 0;
-  /* Reserves native scrollbar width as its own gutter (rather than the
-     scrollbar overlapping row content) and adds a little extra breathing
-     room so it doesn't sit flush against the Risk column. */
-  scrollbar-gutter: stable;
-  padding-right: 10px;
+  overflow: visible;
+  padding: 0;
 }
 
 .recent-scans-row {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
+  padding: 8px 10px 8px 0;
   cursor: pointer;
   transition: background-color 0.15s ease;
   flex-shrink: 0;
@@ -189,8 +219,9 @@
 }
 
 .recent-scans-cell {
-  font-size: 13px;
+  min-width: 0;
   color: #ffffff;
+  font-size: 13px;
   line-height: 1.4;
 }
 
@@ -198,38 +229,47 @@
   color: #9ca3af;
   font-size: 12px;
   font-weight: 500;
-  padding-bottom: 4px;
 }
+
+/* Location */
 
 .recent-scans-cell-location {
-  flex: 1;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding-right: 12px;
 }
+
+/* Type: centers Image and Video directly under Type */
 
 .recent-scans-cell-type {
-  width: 55px;
-  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
+/* Time: centers the timestamp directly under Time */
+
 .recent-scans-cell-time {
-  width: 85px;
-  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   color: #9ca3af;
   font-size: 12px;
-  text-align: right;
-  padding-right: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
 }
 
+/* Risk */
+
 .recent-scans-cell-risk {
-  width: 90px;
-  flex-shrink: 0;
+  width: 100%;
   text-align: right;
   font-weight: 600;
 }
@@ -239,7 +279,10 @@
   font-weight: 500;
 }
 
-/* Responsive */
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
 @media (max-width: 900px) {
   .bottom-panels {
     grid-template-columns: 1fr;
@@ -261,15 +304,15 @@
     padding-right: 16px;
   }
 
-  .recent-scans-cell-type {
-    width: 50px;
+  .recent-scans-columns,
+  .recent-scans-row {
+    grid-template-columns:
+      minmax(0, 1fr)
+      55px
+      75px;
   }
 
   .recent-scans-cell-time {
     display: none;
-  }
-
-  .recent-scans-cell-risk {
-    width: 70px;
   }
 }
