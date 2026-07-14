@@ -118,7 +118,7 @@ def reset_password(
 # --- Cameras ---
 
 @app.get("/api/cameras", response_model=List[CameraSchema])
-def get_cameras(db: Session = Depends(get_db)):
+def get_cameras(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.query(Camera).all()
 
 @app.post("/api/cameras", response_model=CameraSchema)
@@ -156,7 +156,7 @@ def delete_camera(
 # --- Scans ---
 
 @app.get("/api/scans", response_model=List[ScanResultSchema])
-def get_scans(db: Session = Depends(get_db)):
+def get_scans(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.query(ScanResult).order_by(ScanResult.id.desc()).all()
 
 @app.post("/api/scans", response_model=ScanResultSchema)
