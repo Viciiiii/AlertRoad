@@ -15,8 +15,8 @@ class CameraSchema(BaseModel):
 class CameraCreate(BaseModel):
     name: str = Field(min_length=1)
     location: str = Field(min_length=1)
-    lat: float = Field(gt=-90, lt=90)
-    lng: float = Field(gt=-180, lt=180)
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
 
 
 class ScanResultSchema(BaseModel):
