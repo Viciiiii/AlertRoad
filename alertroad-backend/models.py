@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Float, Integer, Boolean, JSON
+from sqlalchemy import Column, String, Float, Integer, Boolean, JSON, DateTime
+from sqlalchemy.sql import func
 from database import Base
 
 class User(Base):
@@ -38,3 +39,4 @@ class ScanResult(Base):
     damage_detected = Column(Boolean, nullable=True)
     risk_reason = Column(String, nullable=True)
     detection_details = Column(JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

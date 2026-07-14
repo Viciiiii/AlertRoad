@@ -1,6 +1,23 @@
 import "./BottomPanels.css";
 import RiskMap from "./RiskMap";
 import { getRiskColor } from "../utils/riskColors";
+import { formatScanTimestamp } from "../utils/formatDate";
+
+// Compact date/time for the narrow Recent Scans row — full value is put
+// in the title attribute for a hover tooltip since this column has little
+// horizontal room. Falls back to an empty string for legacy rows saved
+// before created_at existed.
+function formatScanTimeCompact(createdAt) {
+  if (!createdAt) return "";
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
   return (
@@ -49,6 +66,9 @@ function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
                 <span className="recent-scans-cell recent-scans-cell-type">
                   Type
                 </span>
+                <span className="recent-scans-cell recent-scans-cell-time">
+                  Time
+                </span>
                 <span className="recent-scans-cell recent-scans-cell-risk">
                   Risk
                 </span>
@@ -68,6 +88,12 @@ function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
                     </span>
                     <span className="recent-scans-cell recent-scans-cell-type">
                       {scan.fileType}
+                    </span>
+                    <span
+                      className="recent-scans-cell recent-scans-cell-time"
+                      title={formatScanTimestamp(scan.createdAt) || ""}
+                    >
+                      {formatScanTimeCompact(scan.createdAt)}
                     </span>
                     <span
                       className="recent-scans-cell recent-scans-cell-risk"

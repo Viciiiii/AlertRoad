@@ -166,6 +166,12 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
   opacity: 0.9;
 }
 
+.scan-risk-timestamp {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
 .scan-risk-icon {
   position: absolute;
   top: 16px;

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import datetime
 
 class CameraSchema(BaseModel):
     id: str
@@ -35,6 +36,7 @@ class ScanResultSchema(BaseModel):
     damage_detected: Optional[bool] = None
     risk_reason: Optional[str] = None
     detection_details: Optional[dict] = None
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

@@ -90,6 +90,7 @@ function Dashboard() {
             cameraName: scan.camera_name,
             lat: scan.lat,
             lng: scan.lng,
+            createdAt: scan.created_at,
           }))
         );
 
@@ -198,6 +199,7 @@ function Dashboard() {
         cameraName: saved.camera_name,
         lat: saved.lat,
         lng: saved.lng,
+        createdAt: saved.created_at,
         fileName: selectedFile.name,
         fileUrl: await fetchAuthenticatedFileUrl(saved.image_filename),
         annotatedFileUrl: await fetchAuthenticatedFileUrl(

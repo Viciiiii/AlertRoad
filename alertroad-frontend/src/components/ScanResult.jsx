@@ -3,6 +3,7 @@ import "./ScanResult.css";
 import VideoTimeline from "./VideoTimeline";
 import DetectionOverlay from "./DetectionOverlay";
 import { getRiskColor } from "../utils/riskColors";
+import { formatScanTimestamp } from "../utils/formatDate";
 
 function ScanResult({ scan, onUploadAnother }) {
   // Default to the annotated (bounding-box) view when one exists, since
@@ -128,6 +129,11 @@ function ScanResult({ scan, onUploadAnother }) {
             <p className="scan-risk-label">Risk Level</p>
             <p className="scan-risk-value">{scan.riskLevel}</p>
             <p className="scan-risk-location">📍 {scan.location}</p>
+            {formatScanTimestamp(scan.createdAt) && (
+              <p className="scan-risk-timestamp">
+                {formatScanTimestamp(scan.createdAt)}
+              </p>
+            )}
             <span className="scan-risk-icon">⚠</span>
           </div>
 
