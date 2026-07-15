@@ -22,3 +22,16 @@
   border-radius: 2px;
   white-space: nowrap;
 }
+
+/* Cyan, matching the vehicle box color already burned into annotated
+   IMAGES on the backend (cv2 color (255,255,0) in BGR = cyan) — keeps
+   vehicle boxes visually distinct from red damage boxes, and consistent
+   with how vehicles already look elsewhere in the app. */
+.detection-box-vehicle {
+  border-color: #22d3ee;
+}
+
+.detection-box-label-vehicle {
+  background: #22d3ee;
+  color: #0e2a2e;
+}

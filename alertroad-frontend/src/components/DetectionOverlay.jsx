@@ -101,6 +101,11 @@ function getContainedRect(videoEl) {
  * otherwise no boxes are shown at all, rather than stretching a stale
  * detection across a stretch of video that was never sampled.
  *
+ * Draws two kinds of boxes: red damage boxes (potholes/cracks/etc, gated
+ * on damage_detected) and cyan vehicle boxes (gated only on whether the
+ * matched sample actually has any — traffic is independent of damage, so
+ * a frame with zero damage can still show vehicles).
+ *
  * NOTE: boxes update at sampled-frame granularity, not literally every
  * video frame — sample spacing varies with video length (see
  * video_analysis.py), so a box can appear/disappear up to roughly half a
@@ -109,6 +114,7 @@ function getContainedRect(videoEl) {
 function DetectionOverlay({ videoRef, timeline }) {
   const [rect, setRect] = useState(null);
   const [activeDetections, setActiveDetections] = useState([]);
+  const [activeVehicles, setActiveVehicles] = useState([]);
   const [nativeSize, setNativeSize] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
@@ -125,6 +131,13 @@ function DetectionOverlay({ videoRef, timeline }) {
     const handleTimeUpdate = () => {
       const seg = findActiveSegment(timeline, videoEl.currentTime, maxGapSec);
       setActiveDetections(seg && seg.damage_detected ? seg.detections || [] : []);
+      // Vehicles aren't gated by damage_detected — that flag is about road
+      // damage specifically, not traffic. A frame with zero potholes/cracks
+      // can still have vehicles in it (that's the whole point of the
+      // congestion-anomaly risk factor), so vehicle boxes should show
+      // whenever the matched sample actually has any, independent of
+      // whether damage was found in that same frame.
+      setActiveVehicles(seg ? seg.vehicle_detections || [] : []);
     };
 
     updateRect();
@@ -141,7 +154,9 @@ function DetectionOverlay({ videoRef, timeline }) {
     };
   }, [videoRef, timeline]);
 
-  if (!rect || !nativeSize.w || activeDetections.length === 0) return null;
+  if (!rect || !nativeSize.w || (activeDetections.length === 0 && activeVehicles.length === 0)) {
+    return null;
+  }
 
   const scaleX = rect.width / nativeSize.w;
   const scaleY = rect.height / nativeSize.h;
@@ -155,7 +170,7 @@ function DetectionOverlay({ videoRef, timeline }) {
         const [x1, y1, x2, y2] = d.bbox_xyxy;
         return (
           <div
-            key={i}
+            key={`d-${i}`}
             className="detection-box"
             style={{
               left: x1 * scaleX,
@@ -166,6 +181,25 @@ function DetectionOverlay({ videoRef, timeline }) {
           >
             <span className="detection-box-label">
               {(BUCKET_LABELS[d.bucket] || d.bucket)} {Math.round(d.confidence * 100)}%
+            </span>
+          </div>
+        );
+      })}
+      {activeVehicles.map((v, i) => {
+        const [x1, y1, x2, y2] = v.bbox_xyxy;
+        return (
+          <div
+            key={`v-${i}`}
+            className="detection-box detection-box-vehicle"
+            style={{
+              left: x1 * scaleX,
+              top: y1 * scaleY,
+              width: (x2 - x1) * scaleX,
+              height: (y2 - y1) * scaleY,
+            }}
+          >
+            <span className="detection-box-label detection-box-label-vehicle">
+              {v.class_name} {Math.round(v.confidence * 100)}%
             </span>
           </div>
         );

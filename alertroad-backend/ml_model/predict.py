@@ -354,6 +354,7 @@ def _predict_video(file_path):
             "confidence": r["confidence"],
             "traffic": r["traffic"],
             "detections": r["detection_details"]["raw_detections"],
+            "vehicle_detections": r["detection_details"]["vehicle_detections"],
         })
         frame_pipeline_results.append(r)
 
