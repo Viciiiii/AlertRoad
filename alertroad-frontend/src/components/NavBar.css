@@ -13,6 +13,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  order: 1;
 }
 
 .navbar-logo-clickable {
@@ -34,15 +35,24 @@
   color: var(--ar-brand);
 }
 
+/* =========================================================
+   PRIMARY LINKS — Dashboard, Manage Staff
+   ========================================================= */
+
 .navbar-links {
   display: flex;
   align-items: center;
   gap: 8px;
+  order: 3;
 }
 
 .navbar-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
   background: none;
   border: none;
+  font-family: inherit;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ar-ink-soft);
@@ -57,10 +67,82 @@
   background-color: var(--ar-brand-tint);
 }
 
+.navbar-link.active {
+  color: var(--ar-brand);
+  background-color: var(--ar-brand-tint);
+}
+
+.navbar-link-icon {
+  display: none; /* icons only shown in the sidebar layout, see below */
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.navbar-link-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Dashboard is redundant with the logo click on small screens where there's
+   no persistent sidebar — only show it once there's a sidebar to anchor it. */
+.navbar-link-dashboard {
+  display: none;
+}
+
+/* =========================================================
+   SECONDARY — About (demoted: no icon-pill, muted color)
+   ========================================================= */
+
+.navbar-secondary {
+  display: flex;
+  align-items: center;
+  order: 2;
+}
+
+.navbar-about {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ar-ink-faint);
+  cursor: pointer;
+  padding: 7px 10px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-about:hover {
+  color: var(--ar-ink-soft);
+  background-color: var(--ar-surface-alt, #f5f6f8);
+}
+
+.navbar-about-icon {
+  display: none; /* shown only in the sidebar layout */
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.navbar-about-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================
+   ACTIONS — user badge, logout
+   ========================================================= */
+
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: 12px;
+  order: 4;
 }
 
 .navbar-admin {
@@ -72,11 +154,57 @@
   border-radius: 20px;
 }
 
+.navbar-user {
+  display: none; /* sidebar-only, see below */
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--ar-brand-tint);
+  color: var(--ar-brand);
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.navbar-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.navbar-user-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ar-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+
+.navbar-user-role {
+  font-size: 11px;
+  color: var(--ar-ink-faint);
+}
+
 .navbar-logout {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   padding: 8px 16px;
   background-color: var(--ar-surface);
   border: 1px solid var(--ar-border);
-  border-radius: var(--ar-radius-sm);
+  border-radius: var(--ar-radius-sm, 8px);
+  font-family: inherit;
   font-size: 13px;
   font-weight: 600;
   color: var(--ar-ink);
@@ -85,8 +213,19 @@
 }
 
 .navbar-logout:hover {
-  background-color: var(--ar-surface-alt);
+  background-color: var(--ar-surface-alt, #f5f6f8);
   border-color: #c7cdd6;
+}
+
+.navbar-logout-icon {
+  width: 15px;
+  height: 15px;
+  display: flex;
+}
+
+.navbar-logout-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 768px) {
@@ -94,18 +233,16 @@
     padding: 14px 20px;
   }
 
+  .navbar-secondary,
   .navbar-links {
-    gap: 4px;
-    order: 3;
-    width: 100%;
-    justify-content: center;
+    width: auto;
   }
 }
 
 @media (max-width: 480px) {
-  .navbar-links {
-    gap: 2px;
-    flex-wrap: wrap;
+  .navbar-about {
+    font-size: 12px;
+    padding: 6px 8px;
   }
 
   .navbar-link {
@@ -124,5 +261,134 @@
   .navbar-logout {
     padding: 7px 12px;
     font-size: 12.5px;
+  }
+}
+
+/* =========================================================
+   SIDEBAR — laptop / desktop (1100px+)
+   Same <nav>, same links, restructured as a vertical rail.
+   ========================================================= */
+
+@media (min-width: 1100px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 236px;
+    flex: 0 0 236px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 22px 16px;
+    border-bottom: none;
+    border-right: 1px solid var(--ar-border);
+    background-color: var(--ar-brand);
+    row-gap: 0;
+  }
+
+  .navbar-logo {
+    padding: 4px 8px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    margin-bottom: 16px;
+  }
+
+  .logo-text {
+    color: #ffffff;
+  }
+
+  /* Primary links: Dashboard + Manage Staff, right under the logo */
+  .navbar-links {
+    order: 2;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  .navbar-link-dashboard {
+    display: flex;
+  }
+
+  .navbar-link {
+    justify-content: flex-start;
+    color: rgba(255, 255, 255, 0.72);
+    padding: 10px 12px;
+  }
+
+  .navbar-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .navbar-link.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.14);
+  }
+
+  .navbar-link-icon {
+    display: flex;
+  }
+
+  /* Secondary: About — pushed down to sit just above the footer,
+     separated by a divider, well below the primary links. */
+  .navbar-secondary {
+    order: 3;
+    margin-top: auto;
+    flex-direction: column;
+    align-items: stretch;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  .navbar-about {
+    justify-content: flex-start;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .navbar-about:hover {
+    color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .navbar-about-icon {
+    display: flex;
+  }
+
+  /* Footer: user chip + logout */
+  .navbar-actions {
+    order: 4;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding-top: 14px;
+  }
+
+  .navbar-admin {
+    display: none; /* replaced by navbar-user below */
+  }
+
+  .navbar-user {
+    display: flex;
+  }
+
+  .navbar-user-role {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .navbar-user-name {
+    color: #ffffff;
+  }
+
+  .navbar-logout {
+    justify-content: center;
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .navbar-logout:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 }
