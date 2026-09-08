@@ -1,5 +1,5 @@
 .scan-result {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .scan-result-header {
@@ -10,37 +10,41 @@
 
 .scan-upload-another {
   padding: 10px 18px;
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
   font-size: 13px;
-  font-weight: 500;
-  color: #1a1a1a;
+  font-weight: 600;
+  color: var(--ar-brand);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .scan-upload-another:hover {
-  background-color: #f3f4f6;
+  background-color: var(--ar-surface-alt);
 }
 
 .scan-result-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 20px;
+  gap: 18px;
   align-items: start;
 }
 
 .scan-media-column {
   display: flex;
   flex-direction: column;
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-md);
+  box-shadow: var(--ar-shadow);
+  overflow: hidden;
 }
 
 .scan-media-wrapper {
   position: relative;
-  border-radius: 8px;
   overflow: hidden;
-  background-color: #000000;
+  background-color: #232a33;
   width: 100%;
   max-height: 70vh;
   display: flex;
@@ -57,16 +61,10 @@
   display: block;
 }
 
-/* The custom "Risk over time" bar is the real timeline now, so hide the
-   video's own built-in scrubber to avoid two conflicting seek bars.
-   Webkit-only (Chrome/Edge/Safari) — Firefox doesn't expose a pseudo-
-   element hook for this, so it'll still show its native seek bar there. */
 video.scan-media::-webkit-media-controls-timeline {
   display: none;
 }
 
-/* Play/pause and the time readout now live in the Risk-over-time bar
-   below the video instead, so hide the native ones to avoid two of each. */
 video.scan-media::-webkit-media-controls-play-button,
 video.scan-media::-webkit-media-controls-current-time-display,
 video.scan-media::-webkit-media-controls-time-remaining-display {
@@ -79,18 +77,18 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
   left: 12px;
   z-index: 2;
   display: flex;
-  gap: 6px;
-  background-color: rgba(0, 0, 0, 0.45);
+  gap: 4px;
+  background-color: rgba(20, 30, 45, 0.55);
   padding: 4px;
-  border-radius: 8px;
-  backdrop-filter: blur(2px);
+  border-radius: var(--ar-radius-sm);
+  backdrop-filter: blur(4px);
 }
 
 .scan-media-toggle button {
-  padding: 6px 12px;
+  padding: 7px 12px;
   font-size: 12px;
-  font-weight: 500;
-  color: #e5e5e5;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
   background: transparent;
   border: none;
   border-radius: 6px;
@@ -104,7 +102,7 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
 
 .scan-media-toggle button.active {
   background-color: #ffffff;
-  color: #1a1a1a;
+  color: var(--ar-brand);
 }
 
 .scan-media-note {
@@ -115,24 +113,26 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
   z-index: 2;
   margin: 0;
   padding: 6px 12px;
-  font-size: 12px;
-  color: #e5e5e5;
-  background-color: rgba(0, 0, 0, 0.55);
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(20, 30, 45, 0.6);
 }
 
 .scan-risk-reason {
   font-size: 13px;
-  line-height: 1.4;
-  color: #4b5563;
-  background-color: #f3f4f6;
-  border-radius: 8px;
-  padding: 10px 14px;
+  line-height: 1.55;
+  color: var(--ar-ink-soft);
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
+  padding: 12px 14px;
   margin: 0;
 }
 
 .scan-risk-reason-warning {
-  color: #7a5a1c;
-  background-color: #fdf3e0;
+  color: #6b5000;
+  background-color: var(--ar-medium-bg);
+  border-color: #f0dba0;
 }
 
 .scan-info-column {
@@ -144,67 +144,73 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
 
 .scan-risk-card {
   position: relative;
-  border-radius: 8px;
-  padding: 16px 20px;
+  border-radius: var(--ar-radius-md);
+  padding: 18px 20px;
   color: #ffffff;
+  box-shadow: var(--ar-shadow);
 }
 
 .scan-risk-label {
-  font-size: 13px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   opacity: 0.85;
   margin-bottom: 4px;
 }
 
 .scan-risk-value {
   font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
 .scan-risk-location {
   font-size: 13px;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .scan-risk-timestamp {
   font-size: 12px;
-  opacity: 0.75;
+  opacity: 0.8;
   margin-top: 2px;
 }
 
 .scan-risk-icon {
   position: absolute;
-  top: 16px;
+  top: 18px;
   right: 20px;
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .scan-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
 }
 
 .scan-stat-card {
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  padding: 16px;
-  color: #ffffff;
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
+  padding: 14px 16px;
+  color: var(--ar-ink);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .scan-stat-label {
-  font-size: 12px;
-  color: #a0a0a0;
-  margin-bottom: 6px;
+  font-size: 11px;
+  color: var(--ar-ink-faint);
+  font-weight: 600;
+  margin-bottom: 5px;
 }
 
 .scan-stat-value {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 700;
 }
 
@@ -226,6 +232,6 @@ video.scan-media::-webkit-media-controls-time-remaining-display {
   }
 
   .scan-stat-value {
-    font-size: 18px;
+    font-size: 17px;
   }
 }

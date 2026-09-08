@@ -6,12 +6,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  background-color: #ffffff;
-  color: #1a1a1a;
-  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--ar-radius-sm);
+  border: 1px solid var(--ar-border);
+  background-color: var(--ar-surface);
+  color: var(--ar-ink);
+  font-size: 13.5px;
+  font-weight: 600;
   cursor: pointer;
   max-width: 200px;
 }
@@ -26,7 +27,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4b5563;
+  color: var(--ar-ink-faint);
   flex-shrink: 0;
   transition: transform 0.15s ease;
 }
@@ -40,17 +41,18 @@
   top: calc(100% + 6px);
   left: 0;
   min-width: 260px;
-  background-color: #1e1e1e;
-  border-radius: 8px;
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-md);
   padding: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  z-index: 3000; /* must clear Leaflet's own controls, which use up to z-index: 1000 */
+  box-shadow: 0 10px 30px rgba(20, 30, 45, 0.14);
+  z-index: 3000;
   display: flex;
   flex-direction: column;
 }
 
 .camera-select-empty {
-  color: #9ca3af;
+  color: var(--ar-ink-faint);
   font-size: 13px;
   padding: 10px 12px;
   text-align: left;
@@ -61,18 +63,18 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 8px 8px 12px;
-  border-radius: 6px;
+  padding: 9px 8px 9px 12px;
+  border-radius: var(--ar-radius-sm);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .camera-select-item:hover {
-  background-color: #2a2a2a;
+  background-color: var(--ar-surface-alt);
 }
 
 .camera-select-item.selected {
-  background-color: #2a2a2a;
+  background-color: var(--ar-brand-tint);
 }
 
 .camera-select-item-text {
@@ -85,9 +87,9 @@
 }
 
 .camera-select-item-name {
-  color: #ffffff;
+  color: var(--ar-ink);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -95,7 +97,7 @@
 }
 
 .camera-select-item-location {
-  color: #9ca3af;
+  color: var(--ar-ink-faint);
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -111,7 +113,7 @@
   border-radius: 50%;
   border: none;
   background: none;
-  color: #9ca3af;
+  color: var(--ar-ink-faint);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -122,13 +124,13 @@
 }
 
 .camera-select-delete:hover {
-  background-color: #e02424;
+  background-color: var(--ar-high);
   color: #ffffff;
 }
 
 .camera-select-divider {
   height: 1px;
-  background-color: #333333;
+  background-color: var(--ar-border);
   margin: 6px 0;
 }
 
@@ -136,17 +138,17 @@
   padding: 10px 12px;
   border: none;
   background: none;
-  border-radius: 6px;
-  color: #f5a623;
+  border-radius: var(--ar-radius-sm);
+  color: var(--ar-brand);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   text-align: left;
   transition: background-color 0.15s ease;
 }
 
 .camera-select-add:hover {
-  background-color: #2a2a2a;
+  background-color: var(--ar-brand-tint);
 }
 
 @media (max-width: 480px) {

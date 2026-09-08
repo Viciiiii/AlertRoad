@@ -16,8 +16,8 @@ body {
     Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #1a1a1a;
-  background-color: #ffffff;
+  color: var(--ar-ink);
+  background-color: var(--ar-bg);
 }
 
 button {

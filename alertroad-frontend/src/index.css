@@ -2,12 +2,35 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
+
+  /* ===== AlertRoad design tokens ===== */
+  --ar-bg: #eef1f5;
+  --ar-surface: #ffffff;
+  --ar-surface-alt: #f5f6f8;
+  --ar-border: #e1e5ea;
+  --ar-ink: #1b2430;
+  --ar-ink-soft: #5b6472;
+  --ar-ink-faint: #8a93a0;
+
+  --ar-brand: #173a5e;
+  --ar-brand-dark: #0e2a45;
+  --ar-brand-tint: #eaf1f7;
+  --ar-accent: #2c6e9e;
+
+  --ar-high: #b3261e;
+  --ar-high-bg: #fbeae9;
+  --ar-medium: #b07c00;
+  --ar-medium-bg: #fdf3dc;
+  --ar-low: #1e7b4d;
+  --ar-low-bg: #e8f5ee;
+
+  --ar-radius-sm: 8px;
+  --ar-radius-md: 14px;
+  --ar-radius-lg: 20px;
+
+  --ar-shadow: 0 1px 2px rgba(20, 30, 45, 0.05), 0 6px 16px rgba(20, 30, 45, 0.05);
 }
 
-/* Makes padding/border count INSIDE an element's declared width instead of
-   adding to it — the standard, safer default. Prevents the exact bug we hit
-   in ScanModal.css (width: 100% + padding silently overflowing its
-   container) from happening again anywhere else in the app. */
 *, *::before, *::after {
   box-sizing: border-box;
 }
