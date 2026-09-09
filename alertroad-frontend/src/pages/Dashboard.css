@@ -3,8 +3,8 @@
   background-color: var(--ar-bg);
 }
 
-.dashboard-fold {
-  min-height: calc(100vh - 74px);
+.dashboard-main {
+  min-width: 0;
 }
 
 .dashboard-hero {
@@ -49,5 +49,23 @@
 
   .dashboard-content {
     padding: 0 16px 32px 16px;
+  }
+}
+
+/* =========================================================
+   SIDEBAR LAYOUT — laptop / desktop (1100px+)
+   NavBar becomes a fixed-width sticky column; this makes
+   the rest of the page fill the remaining width beside it.
+   ========================================================= */
+
+@media (min-width: 1100px) {
+  .dashboard-page {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .dashboard-main {
+    flex: 1;
+    min-width: 0;
   }
 }
