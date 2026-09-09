@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
 import BottomPanels from "../components/BottomPanels";
 import ScanModal from "../components/ScanModal";
-import InfoSections from "../components/InfoSections";
 import AddCameraModal from "../components/AddCameraModal";
 import { useAuth } from "../context/AuthContext";
 import { fetchAuthenticatedFileUrl } from "../utils/media";
@@ -16,8 +14,6 @@ const API_URL = "";
 // scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
   const { isAdmin } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
@@ -122,19 +118,6 @@ function Dashboard() {
   // when the click happened from another page (e.g. Manage Staff) instead of
   // the dashboard itself. Without this, we'd just land on top of the page —
   // this is what actually performs the scroll once InfoSections has mounted.
-  useEffect(() => {
-    const scrollToId = location.state?.scrollTo;
-    if (!scrollToId) return;
-
-    const timer = setTimeout(() => {
-      document.getElementById(scrollToId)?.scrollIntoView({ behavior: "smooth" });
-      // Clear the nav state so revisiting/refreshing this route doesn't
-      // scroll again on its own.
-      navigate(location.pathname, { replace: true, state: {} });
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [location.state, location.pathname, navigate]);
 
   const handleFileSelect = (file) => {
     setSelectedFile(file);
@@ -333,53 +316,53 @@ function Dashboard() {
     }
   };
 
-  return (
+      return (
     <div className="dashboard-page">
       <NavBar />
 
-      <div className="dashboard-fold">
-        <div className="dashboard-hero">
-          <h1 className="dashboard-title">
-            See road risk before it becomes an accident
-          </h1>
-          <p className="dashboard-subtitle">
-            AlertRoad reads road images and recorded CCTV footage, detects
-            damage and traffic, and scores accident risk automatically — so LGU
-            teams know exactly where to act first.
-          </p>
-        </div>
+      <div className="dashboard-main">
+        <div className="dashboard-fold">
+          <div className="dashboard-hero">
+            <h1 className="dashboard-title">
+              See road risk before it becomes an accident
+            </h1>
+            <p className="dashboard-subtitle">
+              AlertRoad reads road images and recorded CCTV footage, detects
+              damage and traffic, and scores accident risk automatically — so LGU
+              teams know exactly where to act first.
+            </p>
+          </div>
 
-        <div className="dashboard-content">
-          {scanState === "success" && currentScan ? (
-            <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />
-          ) : (
-            <UploadSection
-              scanState={scanState}
-              onFileSelect={handleFileSelect}
-              onClassify={handleClassify}
-              onRetry={handleRetry}
-              cameras={cameras}
-              selectedCameraId={selectedCameraId}
-              onSelectCamera={setSelectedCameraId}
-              onAddCamera={() => setShowAddCameraModal(true)}
-              onDeleteCamera={handleDeleteCamera}
+          <div className="dashboard-content">
+            {scanState === "success" && currentScan ? (
+              <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />
+            ) : (
+              <UploadSection
+                scanState={scanState}
+                onFileSelect={handleFileSelect}
+                onClassify={handleClassify}
+                onRetry={handleRetry}
+                cameras={cameras}
+                selectedCameraId={selectedCameraId}
+                onSelectCamera={setSelectedCameraId}
+                onAddCamera={() => setShowAddCameraModal(true)}
+                onDeleteCamera={handleDeleteCamera}
+                isAdmin={isAdmin}
+                manualLocation={manualLocation}
+                onManualLocationTextChange={handleManualLocationTextChange}
+                onManualLocationSelect={handleManualLocationSelect}
+              />
+            )}
+
+            <BottomPanels
+              recentScans={recentScans}
+              onSelectScan={handleOpenModal}
               isAdmin={isAdmin}
-              manualLocation={manualLocation}
-              onManualLocationTextChange={handleManualLocationTextChange}
-              onManualLocationSelect={handleManualLocationSelect}
+              onClearAll={handleClearAllScans}
             />
-          )}
-
-          <BottomPanels
-            recentScans={recentScans}
-            onSelectScan={handleOpenModal}
-            isAdmin={isAdmin}
-            onClearAll={handleClearAllScans}
-          />
+          </div>
         </div>
       </div>
-
-      <InfoSections />
 
       {modalScan && (
         <ScanModal

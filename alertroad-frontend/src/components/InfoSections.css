@@ -7,10 +7,6 @@
   text-align: center;
 }
 
-.info-section:last-of-type {
-  padding-bottom: 220px;
-}
-
 .info-section-light {
   background-color: var(--ar-surface);
 }

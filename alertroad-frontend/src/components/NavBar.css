@@ -116,6 +116,11 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+.navbar-about.active {
+  color: var(--ar-ink-soft);
+  background-color: var(--ar-surface-alt, #f5f6f8);
+}
+
 .navbar-about:hover {
   color: var(--ar-ink-soft);
   background-color: var(--ar-surface-alt, #f5f6f8);
@@ -343,6 +348,11 @@
   .navbar-about {
     justify-content: flex-start;
     color: rgba(255, 255, 255, 0.5);
+  }
+
+  .navbar-about.active {
+  color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.08);
   }
 
   .navbar-about:hover {

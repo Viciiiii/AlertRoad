@@ -46,6 +46,7 @@ function NavBar() {
 
   const isOnDashboard = location.pathname === "/dashboard";
   const isOnAdmin = location.pathname === "/admin";
+  const isOnAbout = location.pathname === "/about";
 
   const handleLogout = () => {
     logout();
@@ -56,21 +57,6 @@ function NavBar() {
     // "unless he's already in the dashboard" - do nothing if we're already there
     if (!isOnDashboard) {
       navigate("/dashboard");
-    }
-  };
-
-  const scrollToSection = (id) => {
-    if (!isOnDashboard) {
-      // Not on the dashboard yet (e.g. we're on /admin) - navigate there first,
-      // and tell Dashboard which section to scroll to once it mounts.
-      navigate("/dashboard", { state: { scrollTo: id } });
-      return;
-    }
-
-    // Already on the dashboard - scroll directly.
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -104,7 +90,10 @@ function NavBar() {
       </div>
 
       <div className="navbar-secondary">
-        <button className="navbar-about" onClick={() => scrollToSection("overview")}>
+        <button
+          className={`navbar-about${isOnAbout ? " active" : ""}`}
+          onClick={() => navigate("/about")}
+        >
           <span className="navbar-about-icon">{icons.about}</span>
           <span className="navbar-about-text">About AlertRoad</span>
         </button>

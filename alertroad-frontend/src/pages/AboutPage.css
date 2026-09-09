@@ -1,0 +1,20 @@
+.about-page {
+  min-height: 100vh;
+  background-color: var(--ar-bg);
+}
+
+.about-content {
+  min-width: 0;
+}
+
+@media (min-width: 1100px) {
+  .about-page {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .about-content {
+    flex: 1;
+    min-width: 0;
+  }
+}
