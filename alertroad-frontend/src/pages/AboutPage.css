@@ -8,12 +8,12 @@
 }
 
 @media (min-width: 1100px) {
-  .about-page {
+  .about-page-with-sidebar {
     display: flex;
     align-items: stretch;
   }
 
-  .about-content {
+  .about-page-with-sidebar .about-content {
     flex: 1;
     min-width: 0;
   }

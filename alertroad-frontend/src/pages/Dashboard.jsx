@@ -13,7 +13,7 @@ const API_URL = "";
 
 // scanState: "idle" | "loading" | "success" | "error" | "no-file-error" | "no-camera-error"
 function Dashboard() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated } = useAuth();
 
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
@@ -25,8 +25,6 @@ function Dashboard() {
   const [selectedCameraId, setSelectedCameraId] = useState(null);
   const [showAddCameraModal, setShowAddCameraModal] = useState(false);
 
-  // Used only when selectedCameraId === "manual" (handheld/mobile capture,
-  // where there's no pre-registered camera to pull a location from).
   const [manualLocation, setManualLocation] = useState({
     location: "",
     lat: "",
@@ -46,25 +44,15 @@ function Dashboard() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   });
 
-  // Load past scans and registered cameras from the database on mount
   useEffect(() => {
     const loadScans = async () => {
       try {
-        // NOTE: previously called with no headers at all. /api/scans now
-        // requires login, so this needs the auth header like every other
-        // authenticated request in this file, or it 401s and the dashboard
-        // silently loads with an empty scan list.
         const response = await fetch(`${API_URL}/api/scans`, {
           headers: authHeaders(),
         });
         if (!response.ok) return;
         const data = await response.json();
 
-        // fileUrl/annotatedFileUrl used to be plain "/uploads/<filename>"
-        // strings, since that endpoint was an unauthenticated static mount.
-        // It's now an authenticated route, so <img>/<video src> can't hit
-        // it directly (no way to attach a header) — fetch each file with
-        // the token instead and swap in a blob: URL.
         const formatted = await Promise.all(
           data.map(async (scan) => ({
             ...scan,
@@ -75,11 +63,6 @@ function Dashboard() {
             ),
             damageDetected: scan.damage_detected,
             riskReason: scan.risk_reason,
-            // Right after a fresh upload (handleClassify below), fileType
-            // comes from the browser's File.type on the actual selected
-            // file. On page load/refresh we only have the DB row, so derive
-            // it from the saved filename's extension instead — matching the
-            // formats UploadSection actually accepts (mp4/mov = Video).
             fileType: /\.(mp4|mov)$/i.test(scan.image_filename || "")
               ? "Video"
               : "Image",
@@ -98,7 +81,6 @@ function Dashboard() {
 
     const loadCameras = async () => {
       try {
-        // Same fix as loadScans above: /api/cameras now requires login too.
         const response = await fetch(`${API_URL}/api/cameras`, {
           headers: authHeaders(),
         });
@@ -152,10 +134,6 @@ function Dashboard() {
     }
 
     try {
-      // NOTE: no "Content-Type" header here on purpose. The browser sets it
-      // automatically for FormData (including a required boundary string),
-      // so setting it manually breaks the upload. This is why we can't just
-      // reuse authHeaders() here like the other requests below do.
       const response = await fetch(`${API_URL}/api/scans`, {
         method: "POST",
         headers: {
@@ -256,31 +234,28 @@ function Dashboard() {
   };
 
   const handleDeleteScan = async (scanId) => {
-  try {
-    const response = await fetch(`${API_URL}/api/scans/${scanId}`, {
-      method: "DELETE",
-      headers: authHeaders(),
-    });
+    try {
+      const response = await fetch(`${API_URL}/api/scans/${scanId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
 
-    if (!response.ok) {
-      console.error("Failed to delete scan");
-      return;
+      if (!response.ok) {
+        console.error("Failed to delete scan");
+        return;
+      }
+
+      setRecentScans((prev) => prev.filter((scan) => scan.id !== scanId));
+      setModalScan(null);
+
+      if (currentScan && currentScan.id === scanId) {
+        setCurrentScan(null);
+        setScanState("idle");
+      }
+    } catch (err) {
+      console.error("Delete scan request failed:", err);
     }
-
-    setRecentScans((prev) => prev.filter((scan) => scan.id !== scanId));
-    setModalScan(null);
-
-    // If the scan being deleted is the one currently shown as the
-    // "success" result at the top, clear it too and go back to the
-    // upload view — otherwise it keeps showing a deleted scan.
-    if (currentScan && currentScan.id === scanId) {
-      setCurrentScan(null);
-      setScanState("idle");
-    }
-  } catch (err) {
-    console.error("Delete scan request failed:", err);
-  }
-};
+  };
 
   const handleClearAllScans = async () => {
     if (
@@ -311,8 +286,8 @@ function Dashboard() {
     }
   };
 
-      return (
-    <div className="dashboard-page">
+  return (
+    <div className={`dashboard-page${isAuthenticated ? " dashboard-page-with-sidebar" : ""}`}>
       <NavBar />
 
       <div className="dashboard-main">

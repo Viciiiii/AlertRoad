@@ -13,26 +13,26 @@ function Login() {
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+    e.preventDefault();
+    setError("");
 
-  const trimmedUsername = username.trim();
+    const trimmedUsername = username.trim();
 
-  if (!trimmedUsername || !password.trim()) {
-    setError("Incorrect Username or Password");
-    return;
-  }
+    if (!trimmedUsername || !password.trim()) {
+      setError("Incorrect Username or Password");
+      return;
+    }
 
-  setIsSubmitting(true);
-  try {
-    await login(trimmedUsername, password);
-    navigate("/dashboard");
-  } catch (err) {
-    setError(err.message || "Incorrect Username or Password");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    setIsSubmitting(true);
+    try {
+      await login(trimmedUsername, password);
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Incorrect Username or Password");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="login-page">

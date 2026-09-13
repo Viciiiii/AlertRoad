@@ -36,7 +36,29 @@
 }
 
 /* =========================================================
-   PRIMARY LINKS — Dashboard, Manage Staff
+   PUBLIC NAV — logged-out visitor. Always a plain topbar,
+   at every screen width — this never becomes a sidebar.
+   ========================================================= */
+
+.navbar-login {
+  padding: 9px 20px;
+  background-color: var(--ar-brand);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--ar-radius-sm, 8px);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.navbar-login:hover {
+  background-color: var(--ar-brand-dark);
+}
+
+/* =========================================================
+   PRIMARY LINKS — Dashboard, Manage Staff (authed nav only)
    ========================================================= */
 
 .navbar-links {
@@ -89,7 +111,7 @@
 }
 
 /* =========================================================
-   SECONDARY — About (demoted: no icon-pill, muted color)
+   SECONDARY — About (authed nav only)
    ========================================================= */
 
 .navbar-secondary {
@@ -125,7 +147,7 @@
 }
 
 .navbar-about-icon {
-  display: none; /* shown only in the sidebar layout */
+  display: none;
   width: 14px;
   height: 14px;
   flex-shrink: 0;
@@ -138,7 +160,7 @@
 }
 
 /* =========================================================
-   ACTIONS — user badge, logout
+   ACTIONS — user badge, logout (authed) / login button (public)
    ========================================================= */
 
 .navbar-actions {
@@ -268,14 +290,14 @@
 }
 
 /* =========================================================
-   SIDEBAR — laptop / desktop (1100px+)
-   Now a light neutral rail (Apple Finder/Settings-style sidebar)
-   instead of a solid navy block — navy is reserved for the accent
-   (active state, buttons, badges), not as a large fill color.
+   SIDEBAR — laptop / desktop (1100px+), STAFF/ADMIN ONLY.
+   Every rule here is scoped under .navbar-authed, so the
+   logged-out .navbar-public topbar never turns into a sidebar,
+   at any screen width.
    ========================================================= */
 
 @media (min-width: 1100px) {
-  .navbar {
+  .navbar-authed {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
@@ -291,52 +313,49 @@
     row-gap: 0;
   }
 
-  .navbar-logo {
+  .navbar-authed .navbar-logo {
     padding: 4px 8px 22px;
     border-bottom: 1px solid var(--ar-border);
     margin-bottom: 16px;
   }
 
-  .logo-text {
+  .navbar-authed .logo-text {
     color: var(--ar-brand);
   }
 
-  /* Primary links: Dashboard + Manage Staff, right under the logo */
-  .navbar-links {
+  .navbar-authed .navbar-links {
     order: 2;
     flex-direction: column;
     align-items: stretch;
     gap: 2px;
   }
 
-  .navbar-link-dashboard {
+  .navbar-authed .navbar-link-dashboard {
     display: flex;
   }
 
-  .navbar-link {
+  .navbar-authed .navbar-link {
     justify-content: flex-start;
     color: var(--ar-ink-soft);
     padding: 10px 12px;
   }
 
-  .navbar-link:hover {
+  .navbar-authed .navbar-link:hover {
     color: var(--ar-brand);
     background-color: var(--ar-brand-tint);
   }
 
-  .navbar-link.active {
+  .navbar-authed .navbar-link.active {
     color: var(--ar-brand);
     background-color: var(--ar-brand-tint);
     font-weight: 700;
   }
 
-  .navbar-link-icon {
+  .navbar-authed .navbar-link-icon {
     display: flex;
   }
 
-  /* Secondary: About — pushed down to sit just above the footer,
-     separated by a divider, well below the primary links. */
-  .navbar-secondary {
+  .navbar-authed .navbar-secondary {
     order: 3;
     margin-top: auto;
     flex-direction: column;
@@ -346,27 +365,22 @@
     margin-bottom: 6px;
   }
 
-  .navbar-about {
+  .navbar-authed .navbar-about {
     justify-content: flex-start;
     color: var(--ar-ink-faint);
   }
 
-  .navbar-about.active {
+  .navbar-authed .navbar-about.active,
+  .navbar-authed .navbar-about:hover {
     color: var(--ar-ink-soft);
     background-color: var(--ar-surface);
   }
 
-  .navbar-about:hover {
-    color: var(--ar-ink-soft);
-    background-color: var(--ar-surface);
-  }
-
-  .navbar-about-icon {
+  .navbar-authed .navbar-about-icon {
     display: flex;
   }
 
-  /* Footer: user chip + logout */
-  .navbar-actions {
+  .navbar-authed .navbar-actions {
     order: 4;
     flex-direction: column;
     align-items: stretch;
@@ -375,30 +389,30 @@
     padding-top: 14px;
   }
 
-  .navbar-admin {
-    display: none; /* replaced by navbar-user below */
+  .navbar-authed .navbar-admin {
+    display: none;
   }
 
-  .navbar-user {
+  .navbar-authed .navbar-user {
     display: flex;
   }
 
-  .navbar-user-role {
+  .navbar-authed .navbar-user-role {
     color: var(--ar-ink-faint);
   }
 
-  .navbar-user-name {
+  .navbar-authed .navbar-user-name {
     color: var(--ar-ink);
   }
 
-  .navbar-logout {
+  .navbar-authed .navbar-logout {
     justify-content: center;
     background-color: var(--ar-surface);
     border-color: var(--ar-border);
     color: var(--ar-ink-soft);
   }
 
-  .navbar-logout:hover {
+  .navbar-authed .navbar-logout:hover {
     background-color: var(--ar-surface-alt, #f5f6f8);
     border-color: #c7cdd6;
     color: var(--ar-ink);

@@ -40,28 +40,50 @@ function getInitials(name) {
 }
 
 function NavBar() {
-  const { logout, isAdmin, username } = useAuth();
+  const { logout, isAdmin, username, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isOnDashboard = location.pathname === "/dashboard";
+  const isOnDashboard = location.pathname === "/";
   const isOnAdmin = location.pathname === "/admin";
   const isOnAbout = location.pathname === "/about";
+
+  const handleLogoClick = () => {
+    if (!isOnDashboard) {
+      navigate("/");
+    }
+  };
+
+  // Logged-out visitor: just the logo and a Log In button. No sidebar, no
+  // Manage Staff, no user chip — there's nothing to navigate to besides the
+  // one public Dashboard page they're already on.
+  if (!isAuthenticated) {
+    return (
+      <nav className="navbar navbar-public">
+        <div
+          className={`navbar-logo${!isOnDashboard ? " navbar-logo-clickable" : ""}`}
+          onClick={handleLogoClick}
+        >
+          <img src={alertroadLogo} alt="AlertRoad logo" className="logo-image" />
+          <span className="logo-text">ALERTROAD</span>
+        </div>
+
+        <div className="navbar-actions">
+          <button className="navbar-login" onClick={() => navigate("/login")}>
+            Log In
+          </button>
+        </div>
+      </nav>
+    );
+  }
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  const handleLogoClick = () => {
-    // "unless he's already in the dashboard" - do nothing if we're already there
-    if (!isOnDashboard) {
-      navigate("/dashboard");
-    }
-  };
-
   return (
-    <nav className="navbar">
+    <nav className="navbar navbar-authed">
       <div
         className={`navbar-logo${!isOnDashboard ? " navbar-logo-clickable" : ""}`}
         onClick={handleLogoClick}
@@ -73,7 +95,7 @@ function NavBar() {
       <div className="navbar-links">
         <button
           className={`navbar-link navbar-link-dashboard${isOnDashboard ? " active" : ""}`}
-          onClick={() => (isOnDashboard ? null : navigate("/dashboard"))}
+          onClick={() => (isOnDashboard ? null : navigate("/"))}
         >
           <span className="navbar-link-icon">{icons.dashboard}</span>
           <span className="navbar-link-text">Dashboard</span>
