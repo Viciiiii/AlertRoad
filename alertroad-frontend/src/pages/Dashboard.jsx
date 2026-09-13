@@ -114,11 +114,6 @@ function Dashboard() {
     loadCameras();
   }, []);
 
-  // NavBar's scrollToSection navigates here with { state: { scrollTo: id } }
-  // when the click happened from another page (e.g. Manage Staff) instead of
-  // the dashboard itself. Without this, we'd just land on top of the page —
-  // this is what actually performs the scroll once InfoSections has mounted.
-
   const handleFileSelect = (file) => {
     setSelectedFile(file);
   };

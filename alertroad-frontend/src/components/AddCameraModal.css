@@ -4,7 +4,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(20, 30, 45, 0.55);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,99 +15,116 @@
 
 .add-camera-card {
   position: relative;
-  background-color: #ffffff;
-  border-radius: 10px;
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-lg);
   max-width: 380px;
   width: 100%;
   padding: 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(20, 30, 45, 0.25);
 }
 
 .add-camera-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 14px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: none;
-  background-color: #e02424;
-  color: #ffffff;
-  font-size: 18px;
+  border: 1px solid var(--ar-border);
+  background-color: var(--ar-surface);
+  color: var(--ar-ink-soft);
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.add-camera-close:hover {
+  background-color: var(--ar-high-bg);
+  color: var(--ar-high);
+  border-color: #f2c6c3;
 }
 
 .add-camera-title {
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--ar-ink);
+  letter-spacing: -0.01em;
   margin-bottom: 6px;
 }
 
 .add-camera-subtitle {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--ar-ink-soft);
   margin-bottom: 20px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .add-camera-label {
   display: block;
   font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #1a1a1a;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--ar-ink-soft);
 }
 
 .add-camera-input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
   margin-bottom: 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
   font-size: 14px;
+  color: var(--ar-ink);
+  background-color: var(--ar-surface);
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.add-camera-input::placeholder {
+  color: var(--ar-ink-faint);
 }
 
 .add-camera-input:focus {
-  border-color: #1a1a1a;
+  border-color: var(--ar-brand);
+  box-shadow: 0 0 0 3px var(--ar-brand-tint);
 }
 
 .add-camera-error {
-  color: #e02424;
-  font-size: 12px;
+  color: var(--ar-high);
+  font-size: 12.5px;
+  font-weight: 600;
   margin: -8px 0 16px 0;
 }
 
 .add-camera-submit {
   width: 100%;
   padding: 12px;
-  background-color: #1a1a1a;
-  color: #f5a623;
+  background-color: var(--ar-brand);
+  color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: var(--ar-radius-sm);
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .add-camera-submit:hover {
-  opacity: 0.9;
+  background-color: var(--ar-brand-dark);
+}
+
+.add-camera-location-wrapper {
+  margin-bottom: 16px;
 }
 
 @media (max-width: 480px) {
   .add-camera-card {
     padding: 20px;
   }
-}
-
-.add-camera-location-wrapper {
-  margin-bottom: 16px;
 }

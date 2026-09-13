@@ -84,8 +84,6 @@
   height: 100%;
 }
 
-/* Dashboard is redundant with the logo click on small screens where there's
-   no persistent sidebar — only show it once there's a sidebar to anchor it. */
 .navbar-link-dashboard {
   display: none;
 }
@@ -271,7 +269,9 @@
 
 /* =========================================================
    SIDEBAR — laptop / desktop (1100px+)
-   Same <nav>, same links, restructured as a vertical rail.
+   Now a light neutral rail (Apple Finder/Settings-style sidebar)
+   instead of a solid navy block — navy is reserved for the accent
+   (active state, buttons, badges), not as a large fill color.
    ========================================================= */
 
 @media (min-width: 1100px) {
@@ -287,18 +287,18 @@
     padding: 22px 16px;
     border-bottom: none;
     border-right: 1px solid var(--ar-border);
-    background-color: var(--ar-brand);
+    background-color: var(--ar-surface-alt, #f5f6f8);
     row-gap: 0;
   }
 
   .navbar-logo {
     padding: 4px 8px 22px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    border-bottom: 1px solid var(--ar-border);
     margin-bottom: 16px;
   }
 
   .logo-text {
-    color: #ffffff;
+    color: var(--ar-brand);
   }
 
   /* Primary links: Dashboard + Manage Staff, right under the logo */
@@ -315,18 +315,19 @@
 
   .navbar-link {
     justify-content: flex-start;
-    color: rgba(255, 255, 255, 0.72);
+    color: var(--ar-ink-soft);
     padding: 10px 12px;
   }
 
   .navbar-link:hover {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--ar-brand);
+    background-color: var(--ar-brand-tint);
   }
 
   .navbar-link.active {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.14);
+    color: var(--ar-brand);
+    background-color: var(--ar-brand-tint);
+    font-weight: 700;
   }
 
   .navbar-link-icon {
@@ -340,24 +341,24 @@
     margin-top: auto;
     flex-direction: column;
     align-items: stretch;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: 1px solid var(--ar-border);
     padding-top: 14px;
     margin-bottom: 6px;
   }
 
   .navbar-about {
     justify-content: flex-start;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ar-ink-faint);
   }
 
   .navbar-about.active {
-  color: rgba(255, 255, 255, 0.85);
-  background-color: rgba(255, 255, 255, 0.08);
+    color: var(--ar-ink-soft);
+    background-color: var(--ar-surface);
   }
 
   .navbar-about:hover {
-    color: rgba(255, 255, 255, 0.85);
-    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--ar-ink-soft);
+    background-color: var(--ar-surface);
   }
 
   .navbar-about-icon {
@@ -370,7 +371,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: 1px solid var(--ar-border);
     padding-top: 14px;
   }
 
@@ -383,22 +384,23 @@
   }
 
   .navbar-user-role {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--ar-ink-faint);
   }
 
   .navbar-user-name {
-    color: #ffffff;
+    color: var(--ar-ink);
   }
 
   .navbar-logout {
     justify-content: center;
-    background: transparent;
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.85);
+    background-color: var(--ar-surface);
+    border-color: var(--ar-border);
+    color: var(--ar-ink-soft);
   }
 
   .navbar-logout:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--ar-surface-alt, #f5f6f8);
+    border-color: #c7cdd6;
+    color: var(--ar-ink);
   }
 }

@@ -127,8 +127,8 @@ function warnAboutCoordinateOutliers(scans) {
 export function createTriangleIcon(color) {
   const svg = `
     <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="14,3 25,24 3,24" fill="${color}" stroke="#1a1a1a" stroke-width="1.5" />
-      <text x="14" y="21" font-size="12" font-weight="bold" fill="#1a1a1a" text-anchor="middle">!</text>
+      <polygon points="14,3 25,24 3,24" fill="${color}" stroke="#1B2430" stroke-width="1.5" />
+      <text x="14" y="21" font-size="12" font-weight="bold" fill="#1B2430" text-anchor="middle">!</text>
     </svg>
   `;
 
