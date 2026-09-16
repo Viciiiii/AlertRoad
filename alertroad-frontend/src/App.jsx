@@ -4,7 +4,13 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import AboutPage from "./pages/AboutPage";
 import StaffManagement from "./pages/StaffManagement";
+import ReportsQueue from "./pages/ReportsQueue";
 import "./App.css";
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
 
 function AdminRoute({ children }) {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -19,6 +25,14 @@ function AppRoutes() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <ReportsQueue />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/admin"
         element={

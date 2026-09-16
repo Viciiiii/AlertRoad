@@ -5,6 +5,7 @@ import ScanResult from "../components/ScanResult";
 import BottomPanels from "../components/BottomPanels";
 import ScanModal from "../components/ScanModal";
 import AddCameraModal from "../components/AddCameraModal";
+import ReportForm from "../components/ReportForm";
 import { useAuth } from "../context/AuthContext";
 import { fetchAuthenticatedFileUrl } from "../utils/media";
 import "./Dashboard.css";
@@ -286,7 +287,7 @@ function Dashboard() {
     }
   };
 
-  return (
+    return (
     <div className={`dashboard-page${isAuthenticated ? " dashboard-page-with-sidebar" : ""}`}>
       <NavBar />
 
@@ -304,7 +305,9 @@ function Dashboard() {
           </div>
 
           <div className="dashboard-content">
-            {scanState === "success" && currentScan ? (
+            {!isAuthenticated ? (
+              <ReportForm />
+            ) : scanState === "success" && currentScan ? (
               <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />
             ) : (
               <UploadSection
@@ -324,12 +327,14 @@ function Dashboard() {
               />
             )}
 
-            <BottomPanels
-              recentScans={recentScans}
-              onSelectScan={handleOpenModal}
-              isAdmin={isAdmin}
-              onClearAll={handleClearAllScans}
-            />
+            {isAuthenticated && (
+              <BottomPanels
+                recentScans={recentScans}
+                onSelectScan={handleOpenModal}
+                isAdmin={isAdmin}
+                onClearAll={handleClearAllScans}
+              />
+            )}
           </div>
         </div>
       </div>

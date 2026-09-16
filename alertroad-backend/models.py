@@ -41,3 +41,18 @@ class ScanResult(Base):
     risk_reason = Column(String, nullable=True)
     detection_details = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class CitizenReport(Base):
+    __tablename__ = "citizen_reports"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    location = Column(String, nullable=False)
+    lat = Column(Float, nullable=False)
+    lng = Column(Float, nullable=False)
+    description = Column(String, nullable=True)
+    image_filename = Column(String, nullable=True)
+    status = Column(String, nullable=False, default="pending")
+    reviewed_by = Column(String, nullable=True)
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

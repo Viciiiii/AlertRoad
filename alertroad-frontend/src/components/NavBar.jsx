@@ -12,6 +12,12 @@ const icons = {
       <rect x="13" y="13" width="8" height="8" rx="1.5" />
     </svg>
   ),
+  reports: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M9 3h6l3 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+      <path d="M9 12h6M9 16h4" />
+    </svg>
+  ),
   manageStaff: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <circle cx="9" cy="8" r="3.2" />
@@ -47,6 +53,7 @@ function NavBar() {
   const isOnDashboard = location.pathname === "/";
   const isOnAdmin = location.pathname === "/admin";
   const isOnAbout = location.pathname === "/about";
+  const isOnReports = location.pathname === "/reports";
 
   const handleLogoClick = () => {
     if (!isOnDashboard) {
@@ -99,6 +106,13 @@ function NavBar() {
         >
           <span className="navbar-link-icon">{icons.dashboard}</span>
           <span className="navbar-link-text">Dashboard</span>
+        </button>
+        <button
+          className={`navbar-link${isOnReports ? " active" : ""}`}
+          onClick={() => navigate("/reports")}
+        >
+          <span className="navbar-link-icon">{icons.reports}</span>
+          <span className="navbar-link-text">Reports</span>
         </button>
         {isAdmin && (
           <button

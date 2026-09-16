@@ -1,0 +1,184 @@
+.report-card {
+  background-color: var(--ar-surface);
+  border: 1px solid var(--ar-border);
+  box-shadow: var(--ar-shadow);
+  border-radius: var(--ar-radius-md);
+  padding: 28px 32px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.report-title {
+  color: var(--ar-ink);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.report-subtitle {
+  color: var(--ar-ink-soft);
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 420px;
+  margin: 0 auto 22px;
+}
+
+.report-field {
+  text-align: left;
+  max-width: 440px;
+  margin: 0 auto 16px;
+}
+
+.report-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ar-ink-soft);
+  margin-bottom: 8px;
+}
+
+.report-label-optional {
+  font-weight: 400;
+  color: var(--ar-ink-faint);
+}
+
+.report-browse-button {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--ar-radius-sm);
+  border: 1px solid var(--ar-border);
+  background-color: var(--ar-surface);
+  color: var(--ar-brand);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.report-browse-button:hover {
+  background-color: var(--ar-surface-alt);
+  border-color: #c7cdd6;
+}
+
+.report-file-input {
+  display: none;
+}
+
+.report-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--ar-ink);
+  background-color: var(--ar-surface);
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.report-textarea::placeholder {
+  color: var(--ar-ink-faint);
+}
+
+.report-textarea:focus {
+  border-color: var(--ar-brand);
+  box-shadow: 0 0 0 3px var(--ar-brand-tint);
+}
+
+.report-error-text {
+  color: var(--ar-high);
+  font-size: 12.5px;
+  font-weight: 600;
+  max-width: 440px;
+  margin: 0 auto 16px;
+}
+
+.report-submit {
+  padding: 12px 28px;
+  border-radius: var(--ar-radius-sm);
+  border: none;
+  background-color: var(--ar-brand);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.report-submit:hover:not(:disabled) {
+  background-color: var(--ar-brand-dark);
+}
+
+.report-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   SUCCESS STATE
+   ========================================================= */
+
+.report-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.report-success-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--ar-low-bg);
+  color: var(--ar-low);
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.report-success-title {
+  color: var(--ar-ink);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.report-success-subtitle {
+  color: var(--ar-ink-soft);
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+.report-submit-another {
+  padding: 11px 22px;
+  border-radius: var(--ar-radius-sm);
+  border: 1px solid var(--ar-border);
+  background-color: var(--ar-surface);
+  color: var(--ar-brand);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.report-submit-another:hover {
+  background-color: var(--ar-surface-alt);
+}
+
+@media (max-width: 600px) {
+  .report-card {
+    padding: 24px 20px;
+  }
+}

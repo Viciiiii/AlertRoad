@@ -67,3 +67,22 @@ class UserSchema(BaseModel):
 
 class PasswordReset(BaseModel):
     new_password: str
+
+class CitizenReportSchema(BaseModel):
+    id: int
+    location: str
+    lat: float
+    lng: float
+    description: Optional[str] = None
+    image_filename: Optional[str] = None
+    status: str
+    reviewed_by: Optional[str] = None
+    reviewed_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CitizenReportStatusUpdate(BaseModel):
+    status: str = Field(pattern="^(approved|rejected)$")

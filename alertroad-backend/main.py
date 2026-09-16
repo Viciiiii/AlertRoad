@@ -7,12 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 from database import Base, engine, get_db
-from models import Camera, ScanResult, User
+from models import Camera, ScanResult, User, CitizenReport
 from schemas import (
     CameraSchema, CameraCreate,
     ScanResultSchema,
     UserCreate, UserLogin, Token, UserSchema, PasswordReset,
+    CitizenReportSchema, CitizenReportStatusUpdate,
 )
 from auth import (
     hash_password, verify_password, create_access_token,
@@ -37,6 +39,11 @@ Base.metadata.create_all(bind=engine)
 # automatically if it doesn't exist yet — safe to run every startup.
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Citizen-submitted report photos live in their own subfolder, separate
+# from official scan uploads, purely for on-disk organization/clarity.
+REPORTS_SUBDIR = "reports"
+os.makedirs(os.path.join(UPLOAD_DIR, REPORTS_SUBDIR), exist_ok=True)
 
 # Serves saved files back out over HTTP, e.g. a file saved as
 # "uploads/abc123.jpg" becomes reachable at http://localhost:8000/uploads/abc123.jpg
@@ -173,20 +180,21 @@ def get_scans(db: Session = Depends(get_db), current_user: User = Depends(get_cu
 # --- Uploaded files (images/videos) ---
 # Replaces the old unauthenticated StaticFiles mount at /uploads. Requires
 # login like every other scan-related endpoint. Annotated images are saved
-# under uploads/annotated/ (see ml_model/predict.py's _save_annotated), so
-# this needs to accept that one nested subfolder — a plain {filename}
+# under uploads/annotated/, and citizen report photos under uploads/reports/
+# (see ml_model/predict.py's _save_annotated and submit_report below), so
+# this needs to accept those nested subfolders — a plain {filename}
 # segment can't match a path containing "/" at all (FastAPI 404s before
-# the handler even runs), which previously broke every annotated image.
-# os.path.basename() is still applied to each individual path segment so
-# this can't be used to read files outside UPLOAD_DIR/UPLOAD_DIR/annotated
-# (e.g. "../../auth.py" or "annotated/../../auth.py").
+# the handler even runs). os.path.basename() is still applied to each
+# individual path segment so this can't be used to read files outside
+# UPLOAD_DIR/<allowed-subfolder> (e.g. "../../auth.py" or
+# "annotated/../../auth.py").
 @app.get("/api/uploads/{filepath:path}")
 def get_upload(filepath: str, current_user: User = Depends(get_current_user)):
     parts = filepath.split("/")
     if len(parts) == 1:
         file_path = os.path.join(UPLOAD_DIR, os.path.basename(parts[0]))
-    elif len(parts) == 2 and parts[0] == "annotated":
-        file_path = os.path.join(UPLOAD_DIR, "annotated", os.path.basename(parts[1]))
+    elif len(parts) == 2 and parts[0] in ("annotated", "reports"):
+        file_path = os.path.join(UPLOAD_DIR, parts[0], os.path.basename(parts[1]))
     else:
         raise HTTPException(status_code=404, detail="File not found")
 
@@ -325,6 +333,100 @@ def delete_all_scans(
 
     db.commit()
     return {"message": f"Deleted {len(scans)} scan(s)"}
+
+# --- Citizen reports ---
+# Public submission (no login) into a pending queue. Never touches
+# ScanResult / the YOLO pipeline — a report only becomes visible/trusted
+# once a logged-in staff member reviews it via the endpoints below.
+
+@app.post("/api/reports", response_model=CitizenReportSchema)
+def submit_report(
+    file: Optional[UploadFile] = File(None),
+    location: str = Form(...),
+    lat: float = Form(...),
+    lng: float = Form(...),
+    description: Optional[str] = Form(None),
+    db: Session = Depends(get_db),
+):
+    if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+        raise HTTPException(
+            status_code=400,
+            detail="lat must be between -90 and 90, and lng between -180 and 180",
+        )
+
+    image_filename = None
+    if file is not None:
+        file_ext = os.path.splitext(file.filename)[1]
+        image_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join(UPLOAD_DIR, REPORTS_SUBDIR, image_filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+    new_report = CitizenReport(
+        location=location,
+        lat=lat,
+        lng=lng,
+        description=description,
+        image_filename=image_filename,
+        status="pending",
+    )
+    db.add(new_report)
+    db.commit()
+    db.refresh(new_report)
+    return new_report
+
+@app.get("/api/reports", response_model=List[CitizenReportSchema])
+def list_reports(
+    status: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Any logged-in staff member can review the queue, not just admins —
+    # this is day-to-day triage work, same spirit as classifying a scan.
+    query = db.query(CitizenReport)
+    if status:
+        query = query.filter(CitizenReport.status == status)
+    return query.order_by(CitizenReport.created_at.desc()).all()
+
+@app.put("/api/reports/{report_id}/status", response_model=CitizenReportSchema)
+def update_report_status(
+    report_id: int,
+    payload: CitizenReportStatusUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    report = db.query(CitizenReport).filter(CitizenReport.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    report.status = payload.status
+    report.reviewed_by = current_user.username
+    report.reviewed_at = func.now()
+    db.commit()
+    db.refresh(report)
+    return report
+
+@app.delete("/api/reports/{report_id}")
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    report = db.query(CitizenReport).filter(CitizenReport.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    if report.image_filename:
+        file_path = os.path.join(UPLOAD_DIR, REPORTS_SUBDIR, report.image_filename)
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except OSError as e:
+                print(f"Warning: could not delete file {file_path}: {e}")
+
+    db.delete(report)
+    db.commit()
+    return {"message": "Report deleted"}
 
 FRONTEND_DIST = os.path.join("..", "alertroad-frontend", "dist")
 
