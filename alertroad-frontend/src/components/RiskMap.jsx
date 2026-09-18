@@ -141,15 +141,39 @@ export function createTriangleIcon(color) {
   });
 }
 
+// A distinct pin shape (not the risk triangle) for community reports —
+// these haven't been through the YOLO classifier, so they deliberately
+// don't look like a verified, risk-scored scan.
+export function createReportIcon() {
+  const svg = `
+    <svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="13" cy="13" r="10" fill="#2C6E9E" stroke="#ffffff" stroke-width="2" />
+      <text x="13" y="17.5" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">?</text>
+    </svg>
+  `;
+
+  return L.divIcon({
+    html: svg,
+    className: "risk-map-marker-icon",
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+    popupAnchor: [0, -13],
+  });
+}
+
 export const DEFAULT_CENTER = [14.631, 121.079]; // Quezon City fallback
 export const DEFAULT_ZOOM = 13;
 
-function RiskMap({ scans }) {
+function RiskMap({ scans, reports = [] }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const scansWithCoords = scans.filter(
     (scan) => typeof scan.lat === "number" && typeof scan.lng === "number"
   );
+  const reportsWithCoords = reports.filter(
+    (report) => typeof report.lat === "number" && typeof report.lng === "number"
+  );
+  const allPointsForBounds = [...scansWithCoords, ...reportsWithCoords];
 
   useEffect(() => {
     warnAboutCoordinateOutliers(scansWithCoords);
@@ -187,14 +211,14 @@ function RiskMap({ scans }) {
 
           <MapResizeHandler />
           <FitBoundsHandler
-            scans={scansWithCoords}
+            scans={allPointsForBounds}
             fallbackCenter={DEFAULT_CENTER}
             fallbackZoom={DEFAULT_ZOOM}
           />
 
           {scansWithCoords.map((scan, index) => (
             <Marker
-              key={index}
+              key={`scan-${index}`}
               position={[scan.lat, scan.lng]}
               icon={createTriangleIcon(RISK_COLORS[scan.riskLevel] || RISK_COLORS.Low)}
             >
@@ -205,12 +229,33 @@ function RiskMap({ scans }) {
               </Popup>
             </Marker>
           ))}
+
+          {reportsWithCoords.map((report, index) => (
+            <Marker
+              key={`report-${index}`}
+              position={[report.lat, report.lng]}
+              icon={createReportIcon()}
+            >
+              <Popup>
+                <strong>{report.location}</strong>
+                <br />
+                Community Reported
+                {report.description && (
+                  <>
+                    <br />
+                    {report.description}
+                  </>
+                )}
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
       )}
 
       {isExpanded && (
         <RiskMapModal
           scans={scansWithCoords}
+          reports={reportsWithCoords}
           onClose={() => setIsExpanded(false)}
         />
       )}

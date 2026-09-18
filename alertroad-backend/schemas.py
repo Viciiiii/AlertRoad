@@ -86,3 +86,13 @@ class CitizenReportSchema(BaseModel):
 
 class CitizenReportStatusUpdate(BaseModel):
     status: str = Field(pattern="^(approved|rejected)$")
+
+
+class PublicMapPoint(BaseModel):
+    type: str  # "scan" (official, risk-classified) or "report" (citizen, approved)
+    location: str
+    lat: float
+    lng: float
+    risk_level: Optional[str] = None   # only set for type == "scan"
+    description: Optional[str] = None  # only set for type == "report"
+    created_at: Optional[datetime] = None

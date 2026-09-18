@@ -66,6 +66,10 @@
   background-color: var(--ar-high);
 }
 
+.legend-report {
+  background-color: #2c6e9e;
+}
+
 .panel-body {
   flex: 1;
   display: flex;

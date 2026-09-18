@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import {
   RISK_COLORS,
   createTriangleIcon,
+  createReportIcon,
   DEFAULT_CENTER,
   DEFAULT_ZOOM,
   MapResizeHandler,
@@ -9,7 +10,7 @@ import {
 } from "./RiskMap";
 import "./RiskMapModal.css";
 
-function RiskMapModal({ scans, onClose }) {
+function RiskMapModal({ scans, reports = [], onClose }) {
   const handleBackdropClick = () => {
     onClose();
   };
@@ -17,6 +18,8 @@ function RiskMapModal({ scans, onClose }) {
   const handleCardClick = (e) => {
     e.stopPropagation();
   };
+
+  const allPointsForBounds = [...scans, ...reports];
 
   return (
     <div className="risk-map-modal-backdrop" onClick={handleBackdropClick}>
@@ -35,6 +38,7 @@ function RiskMapModal({ scans, onClose }) {
             <span className="risk-map-modal-legend-dot risk-map-modal-legend-low" /> Low
             <span className="risk-map-modal-legend-dot risk-map-modal-legend-medium" /> Medium
             <span className="risk-map-modal-legend-dot risk-map-modal-legend-high" /> High
+            <span className="risk-map-modal-legend-dot risk-map-modal-legend-report" /> Reported
           </span>
         </div>
 
@@ -52,14 +56,14 @@ function RiskMapModal({ scans, onClose }) {
 
             <MapResizeHandler />
             <FitBoundsHandler
-              scans={scans}
+              scans={allPointsForBounds}
               fallbackCenter={DEFAULT_CENTER}
               fallbackZoom={DEFAULT_ZOOM}
             />
 
             {scans.map((scan, index) => (
               <Marker
-                key={index}
+                key={`scan-${index}`}
                 position={[scan.lat, scan.lng]}
                 icon={createTriangleIcon(
                   RISK_COLORS[scan.riskLevel] || RISK_COLORS.Low
@@ -69,6 +73,26 @@ function RiskMapModal({ scans, onClose }) {
                   <strong>{scan.location}</strong>
                   <br />
                   Risk: {scan.riskLevel}
+                </Popup>
+              </Marker>
+            ))}
+
+            {reports.map((report, index) => (
+              <Marker
+                key={`report-${index}`}
+                position={[report.lat, report.lng]}
+                icon={createReportIcon()}
+              >
+                <Popup>
+                  <strong>{report.location}</strong>
+                  <br />
+                  Community Reported
+                  {report.description && (
+                    <>
+                      <br />
+                      {report.description}
+                    </>
+                  )}
                 </Popup>
               </Marker>
             ))}

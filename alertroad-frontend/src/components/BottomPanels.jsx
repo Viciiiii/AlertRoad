@@ -19,7 +19,9 @@ function formatScanTimeCompact(createdAt) {
   });
 }
 
-function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
+function BottomPanels({ recentScans, approvedReports = [], onSelectScan, isAdmin, onClearAll }) {
+  const hasAnyMapData = recentScans.length > 0 || approvedReports.length > 0;
+
   return (
     <div className="bottom-panels">
       <div className="panel road-risk-panel">
@@ -29,15 +31,16 @@ function BottomPanels({ recentScans, onSelectScan, isAdmin, onClearAll }) {
             <span className="legend-dot legend-low" /> Low
             <span className="legend-dot legend-medium" /> Medium
             <span className="legend-dot legend-high" /> High
+            <span className="legend-dot legend-report" /> Reported
           </span>
         </div>
         <div className="panel-body road-risk-body">
-          {recentScans.length === 0 ? (
+          {!hasAnyMapData ? (
             <p className="panel-empty-text">
               No scans yet — pins will appear here after your first upload
             </p>
           ) : (
-            <RiskMap scans={recentScans} />
+            <RiskMap scans={recentScans} reports={approvedReports} />
           )}
         </div>
       </div>

@@ -34,6 +34,25 @@
   padding: 0 24px 48px 24px;
 }
 
+/* =========================================================
+   PUBLIC PAGE — form + map side by side on wider screens.
+   Collapses to stacked below 900px, same breakpoint bottom-panels
+   already uses for its own two-column layout.
+   ========================================================= */
+
+.public-dashboard-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .public-dashboard-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 480px) {
   .dashboard-hero {
     padding: 32px 16px 24px 16px;

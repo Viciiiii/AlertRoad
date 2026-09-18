@@ -15,6 +15,7 @@ from schemas import (
     ScanResultSchema,
     UserCreate, UserLogin, Token, UserSchema, PasswordReset,
     CitizenReportSchema, CitizenReportStatusUpdate,
+    PublicMapPoint,
 )
 from auth import (
     hash_password, verify_password, create_access_token,
@@ -246,7 +247,7 @@ def create_scan(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-   # Run the real AlertRoad detection pipeline: fine-tuned YOLO (damage) +
+    # Run the real AlertRoad detection pipeline: fine-tuned YOLO (damage) +
     # COCO YOLO (vehicles/traffic) + Random Forest (risk classification).
     try:
         prediction = predict_road_risk(file_path)
@@ -427,6 +428,41 @@ def delete_report(
     db.delete(report)
     db.commit()
     return {"message": "Report deleted"}
+
+# --- Public transparency map ---
+# Deliberately minimal: location + risk level (or a report's description),
+# never the underlying photo/video, detection counts, camera name, or
+# reviewer identity. Full detail stays behind login; only "where and how
+# bad" is public.
+
+@app.get("/api/public/map", response_model=List[PublicMapPoint])
+def public_map(db: Session = Depends(get_db)):
+    points = []
+
+    for scan in db.query(ScanResult).all():
+        if scan.lat is None or scan.lng is None:
+            continue
+        points.append(PublicMapPoint(
+            type="scan",
+            location=scan.location,
+            lat=scan.lat,
+            lng=scan.lng,
+            risk_level=scan.risk_level,
+            created_at=scan.created_at,
+        ))
+
+    approved = db.query(CitizenReport).filter(CitizenReport.status == "approved").all()
+    for report in approved:
+        points.append(PublicMapPoint(
+            type="report",
+            location=report.location,
+            lat=report.lat,
+            lng=report.lng,
+            description=report.description,
+            created_at=report.created_at,
+        ))
+
+    return points
 
 FRONTEND_DIST = os.path.join("..", "alertroad-frontend", "dist")
 

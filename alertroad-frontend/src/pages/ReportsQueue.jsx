@@ -50,9 +50,8 @@ function ReportsQueue() {
       }
     };
 
-    loadReports();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+        loadReports();
+      }, [activeTab]);
 
   const handleDecision = async (reportId, status) => {
     setBusyId(reportId);

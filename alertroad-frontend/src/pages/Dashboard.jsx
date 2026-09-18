@@ -6,6 +6,7 @@ import BottomPanels from "../components/BottomPanels";
 import ScanModal from "../components/ScanModal";
 import AddCameraModal from "../components/AddCameraModal";
 import ReportForm from "../components/ReportForm";
+import PublicRiskMap from "../components/PublicRiskMap";
 import { useAuth } from "../context/AuthContext";
 import { fetchAuthenticatedFileUrl } from "../utils/media";
 import "./Dashboard.css";
@@ -19,6 +20,7 @@ function Dashboard() {
   const [scanState, setScanState] = useState("idle");
   const [currentScan, setCurrentScan] = useState(null);
   const [recentScans, setRecentScans] = useState([]);
+  const [approvedReports, setApprovedReports] = useState([]);
   const [modalScan, setModalScan] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -45,7 +47,12 @@ function Dashboard() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   });
 
+  // Cameras/scans/approved-reports are all staff-only data — no point
+  // firing these (and getting 401s back) for a logged-out visitor who
+  // will never see UploadSection/BottomPanels anyway.
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const loadScans = async () => {
       try {
         const response = await fetch(`${API_URL}/api/scans`, {
@@ -93,9 +100,31 @@ function Dashboard() {
       }
     };
 
+    const loadApprovedReports = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/api/reports?status=approved`,
+          { headers: authHeaders() }
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+        setApprovedReports(
+          data.map((report) => ({
+            location: report.location,
+            lat: report.lat,
+            lng: report.lng,
+            description: report.description,
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to load approved reports:", err);
+      }
+    };
+
     loadScans();
     loadCameras();
-  }, []);
+    loadApprovedReports();
+  }, [isAuthenticated]);
 
   const handleFileSelect = (file) => {
     setSelectedFile(file);
@@ -287,7 +316,7 @@ function Dashboard() {
     }
   };
 
-    return (
+  return (
     <div className={`dashboard-page${isAuthenticated ? " dashboard-page-with-sidebar" : ""}`}>
       <NavBar />
 
@@ -306,7 +335,10 @@ function Dashboard() {
 
           <div className="dashboard-content">
             {!isAuthenticated ? (
-              <ReportForm />
+              <div className="public-dashboard-row">
+                <ReportForm />
+                <PublicRiskMap />
+              </div>
             ) : scanState === "success" && currentScan ? (
               <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />
             ) : (
@@ -330,6 +362,7 @@ function Dashboard() {
             {isAuthenticated && (
               <BottomPanels
                 recentScans={recentScans}
+                approvedReports={approvedReports}
                 onSelectScan={handleOpenModal}
                 isAdmin={isAdmin}
                 onClearAll={handleClearAllScans}

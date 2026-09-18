@@ -106,6 +106,10 @@
   background-color: var(--ar-high);
 }
 
+.risk-map-modal-legend-report {
+  background-color: #2c6e9e;
+}
+
 .risk-map-modal-map-wrapper {
   flex: 1;
   min-height: 0;
