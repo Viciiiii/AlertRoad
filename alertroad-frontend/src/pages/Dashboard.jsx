@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import NavBar from "../components/NavBar";
 import UploadSection from "../components/UploadSection";
 import ScanResult from "../components/ScanResult";
@@ -41,6 +41,27 @@ function Dashboard() {
   const handleManualLocationSelect = ({ address, lat, lng }) => {
     setManualLocation({ location: address, lat, lng });
   };
+
+    // Leaflet maps are notorious for not playing well with pure-CSS
+  // equal-height layouts — rather than fight the grid/flexbox intrinsic
+  // sizing algorithm, just measure the form's real rendered height and
+  // apply it directly to the map's wrapper.
+  const reportCardRef = useRef(null);
+  const [publicMapHeight, setPublicMapHeight] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated || !reportCardRef.current) return;
+
+    const el = reportCardRef.current;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setPublicMapHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [isAuthenticated]);
 
   const authHeaders = () => ({
     "Content-Type": "application/json",
@@ -334,10 +355,17 @@ function Dashboard() {
           </div>
 
           <div className="dashboard-content">
-            {!isAuthenticated ? (
+                        {!isAuthenticated ? (
               <div className="public-dashboard-row">
-                <ReportForm />
-                <PublicRiskMap />
+                <div ref={reportCardRef}>
+                  <ReportForm />
+                </div>
+                <div
+                  className="public-map-col"
+                  style={publicMapHeight ? { height: `${publicMapHeight}px` } : undefined}
+                >
+                  <PublicRiskMap />
+                </div>
               </div>
             ) : scanState === "success" && currentScan ? (
               <ScanResult scan={currentScan} onUploadAnother={handleUploadAnother} />

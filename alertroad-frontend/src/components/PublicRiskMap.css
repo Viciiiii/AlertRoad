@@ -1,22 +1,11 @@
-.public-map-panel {
-  margin-top: 4px;
-}
-
-/* Scoped to the public panel only — the staff dashboard's map (RiskMap
-   used inside BottomPanels) relies on .risk-map-wrapper's own
-   border-radius + overflow:hidden to clip its corners, since its outer
-   wrapper (.road-risk-body) has no clipping of its own. Overriding the
-   shared class globally would leave that staff map's square tiles
-   poking out past its rounded frame, so this only removes rounding
-   where nothing else was relying on it: here, where .panel itself
-   already clips to its own rounded corners. */
-.public-map-panel .risk-map-wrapper {
-  border-radius: 0;
+.public-map-panel .risk-map-wrapper,
+.public-map-panel .risk-map-container {
+  min-height: 0;
 }
 
 .public-map-body {
   flex: 1;
-  min-height: 320px;
+  min-height: 0;
   padding: 0;
   align-items: stretch;
   justify-content: stretch;

@@ -47,6 +47,14 @@
   align-items: stretch;
 }
 
+.public-map-col {
+  min-width: 0;
+}
+
+.public-map-col .panel {
+  height: 100%;
+}
+
 @media (max-width: 900px) {
   .public-dashboard-row {
     grid-template-columns: 1fr;
