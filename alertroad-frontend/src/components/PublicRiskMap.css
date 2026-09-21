@@ -18,4 +18,6 @@
   flex: 1;
   min-height: 320px;
   padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
 }
